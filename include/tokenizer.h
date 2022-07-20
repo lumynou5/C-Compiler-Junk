@@ -1,5 +1,5 @@
-#ifndef C_COMPILER_TOKEN_H
-#define C_COMPILER_TOKEN_H
+#ifndef C_COMPILER_TOKENIZER_H
+#define C_COMPILER_TOKENIZER_H
 
 #include <stdexcept>
 #include <fmt/format.h>
@@ -12,10 +12,9 @@ enum class TokenKind {
 
 struct Token {
     TokenKind kind;
-    union {
-        long val;
-        char* str;
-    };
+    long val;
+    char* line;
+    char* str;
     Token* next;
 };
 
@@ -30,23 +29,12 @@ void compilationError(char* line, char* col, const char* fmt, const Args& ...arg
     std::exit(EXIT_FAILURE);
 }
 
-inline const char* getTokenKindName(TokenKind kind) {
-    switch (kind) {
-        case TokenKind::Op:
-            return "operator";
-        case TokenKind::Num:
-            return "number";
-        case TokenKind::Eof:
-            return "EOF";
-        default:
-            return "";
-    }
-}
+Token* tokenize(char* source);
 
 bool consume(Token*& token, char op);
 
 long expectNumber(Token*& token);
 
-Token* newToken(TokenKind kind, Token* parent, char* str);
+Token* newToken(TokenKind kind, Token* parent, char* line, char* str);
 
-#endif //C_COMPILER_TOKEN_H
+#endif //C_COMPILER_TOKENIZER_H
