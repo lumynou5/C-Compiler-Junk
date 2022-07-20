@@ -1,6 +1,7 @@
 #include <iostream>
 #include "tokenizer.h"
 #include "parser.h"
+#include "generator.h"
 
 int main(int argc, char** argv) {
     if (argc != 2) {
@@ -13,6 +14,14 @@ int main(int argc, char** argv) {
 
     // Parse.
     Node* node = parse(token);
+
+    // Generate.
+    std::cout << ".intel_syntax noprefix\n"
+                 ".globl main\n"
+                 "main:\n"
+              << generate(node)
+              << "    pop rax\n"
+                 "    ret\n";
 
     return EXIT_SUCCESS;
 }
