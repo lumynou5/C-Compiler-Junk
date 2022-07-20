@@ -10,6 +10,12 @@ Node* newNode(NodeKind kind, Node* lhs, Node* rhs) {
     return node;
 }
 
+Node* newNumNode(long val) {
+    auto* node = newNode(NodeKind::Num, nullptr, nullptr);
+    node->val = val;
+    return node;
+}
+
 Node* parse(Token* token) {
     return expr(token);
 }
@@ -29,17 +35,27 @@ Node* expr(Token*& token) {
 }
 
 Node* mul(Token*& token) {
-    Node* node = primary(token);
+    Node* node = unary(token);
 
     while (true) {
         if (consume(token, '*')) {
-            node = newNode(NodeKind::Mul, node, primary(token));
+            node = newNode(NodeKind::Mul, node, unary(token));
         } else if (consume(token, '/')) {
-            node = newNode(NodeKind::Div, node, primary(token));
+            node = newNode(NodeKind::Div, node, unary(token));
         } else {
             return node;
         }
     }
+}
+
+Node* unary(Token*& token) {
+    if (consume(token, '+')) {
+        return primary(token);
+    } else if (consume(token, '-')) {
+        return newNode(NodeKind::Sub, newNumNode(0), primary(token));
+    }
+
+    return primary(token);
 }
 
 Node* primary(Token*& token) {

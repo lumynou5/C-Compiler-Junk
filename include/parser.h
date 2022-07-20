@@ -20,6 +20,8 @@ struct Node {
 
 Node* newNode(NodeKind kind, Node* lhs, Node* rhs);
 
+Node* newNumNode(long val);
+
 /// @brief Parse tokens to get the syntax tree.
 /// @param token The beginning of the token sequence.
 /// @return The root of the syntax tree.
@@ -36,6 +38,12 @@ Node* expr(Token*& token);
 /// @param token The beginning of a subexpression.
 /// @return The root of the syntax tree.
 Node* mul(Token*& token);
+
+/// @brief Parse tokens to get the syntax tree of a unary subexpression.
+/// EBNF: unary = ("+" | "-")? primary
+/// @param token The beginning of a subexpression.
+/// @return The root of the syntax tree.
+Node* unary(Token*& token);
 
 /// @brief Parse tokens to get the syntax tree of a primary subexpression.
 /// EBNF: "(" expr ")" | num
