@@ -1,5 +1,7 @@
 #include "parser.h"
 
+#include "error.h"
+
 Node* newNode(NodeKind kind, Node* lhs, Node* rhs) {
     auto* node = new Node;
     node->kind = kind;

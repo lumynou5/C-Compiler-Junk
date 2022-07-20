@@ -1,5 +1,7 @@
 #include "tokenizer.h"
 
+#include "error.h"
+
 Token* tokenize(char* source) {
     char* line = source;
     char* ptr = source;
