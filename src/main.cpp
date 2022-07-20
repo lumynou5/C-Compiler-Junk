@@ -2,14 +2,18 @@
 #include <fmt/format.h>
 #include "token.h"
 
+char* source;
+
 int main(int argc, char** argv) {
     if (argc != 2) {
-        std::cerr << "Couldn't recognize the arguments." << std::endl;
+        std::cerr << "Couldn't recognize the arguments.";
         return EXIT_FAILURE;
     }
 
+    source = argv[1];
+
     // Tokenize.
-    char* ptr = argv[1];
+    char* ptr = source;
     Token head;
     Token* curr = &head;
     while (*ptr) {
@@ -29,37 +33,29 @@ int main(int argc, char** argv) {
             continue;
         }
 
-        fmt::print(stderr, "Unexpected character `{}` found.", *ptr);
-        return EXIT_FAILURE;
+        compilationError(source, ptr, "Unexpected character.");
     }
     newToken(TokenKind::Eof, curr, ptr);
     curr = head.next;
 
     // Generate.
-    try {
-        fmt::print(".intel_syntax noprefix\n");
-        fmt::print(".globl main\n");
-        fmt::print("main:\n");
-        fmt::print("    mov rax, {}\n", expectNumber(curr));
-        while (curr->kind != TokenKind::Eof) {
-            if (consume(curr, '+')) {
-                fmt::print("    add rax, {}\n", expectNumber(curr));
-                continue;
-            }
-            if (consume(curr, '-')) {
-                fmt::print("    sub rax, {}\n", expectNumber(curr));
-                continue;
-            }
-
-            throw std::invalid_argument(
-                    fmt::format("Expected operator but found {}.", getTokenKindName(curr->kind))
-            );
+    fmt::print(".intel_syntax noprefix\n");
+    fmt::print(".globl main\n");
+    fmt::print("main:\n");
+    fmt::print("    mov rax, {}\n", expectNumber(curr));
+    while (curr->kind != TokenKind::Eof) {
+        if (consume(curr, '+')) {
+            fmt::print("    add rax, {}\n", expectNumber(curr));
+            continue;
         }
-        fmt::print("    ret\n");
-    } catch (std::exception& e) {
-        fmt::print(stderr, e.what());
-        return EXIT_FAILURE;
+        if (consume(curr, '-')) {
+            fmt::print("    sub rax, {}\n", expectNumber(curr));
+            continue;
+        }
+
+        compilationError(source, ptr, "");
     }
+    fmt::print("    ret\n");
 
     return EXIT_SUCCESS;
 }

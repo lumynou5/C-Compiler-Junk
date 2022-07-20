@@ -1,7 +1,6 @@
 #include "token.h"
 
-#include <stdexcept>
-#include <fmt/format.h>
+extern char* source;
 
 bool consume(Token*& token, char op) {
     if (token->kind != TokenKind::Op || token->str[0] != op) {
@@ -11,17 +10,9 @@ bool consume(Token*& token, char op) {
     return true;
 }
 
-void expect(Token*& token, char op) {
-    if (!consume(token, op)) {
-        throw std::invalid_argument(fmt::format("Expected `{}` but found `{}`.", op, token->str));
-    }
-}
-
 long expectNumber(Token*& token) {
     if (token->kind != TokenKind::Num) {
-        throw std::invalid_argument(
-                fmt::format("Expected a number but found {}.", getTokenKindName(token->kind))
-        );
+        compilationError(source, token->str, "Expect a number.");
     }
     long val = token->val;
     token = token->next;
