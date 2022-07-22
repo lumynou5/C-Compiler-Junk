@@ -18,6 +18,26 @@ std::string generate(Node* node) {
               "    pop rax\n";
 
     switch (node->kind) {
+        case NodeKind::Eq:
+            result += "    cmp rax, rdi\n"
+                      "    sete al\n"
+                      "    movzb rax, al\n";
+            break;
+        case NodeKind::NotEq:
+            result += "    cmp rax, rdi\n"
+                      "    setne al\n"
+                      "    movzb rax, al\n";
+            break;
+        case NodeKind::Less:
+            result += "    cmp rax, rdi\n"
+                      "    setl al\n"
+                      "    movzb rax, al\n";
+            break;
+        case NodeKind::LessEq:
+            result += "    cmp rax, rdi\n"
+                      "    setle al\n"
+                      "    movzb rax, al\n";
+            break;
         case NodeKind::Add:
             result += "    add rax, rdi\n";
             break;
