@@ -15,15 +15,16 @@ Token* tokenize(char* source) {
         if (std::isspace(*ptr)) {
             // Ignore if it's space.
             ++ptr;
-        } else if (!(strncmp(ptr, "==", 2) && strncmp(ptr, "!=", 2) && strncmp(ptr, "<=", 2) && strncmp(ptr, ">=", 2))) {
-            curr = newToken(TokenKind::Op, curr, line, ptr, 2);
-            ptr += 2;
-        } else if (*ptr == '+' || *ptr == '-' || *ptr == '*' || *ptr == '/' || *ptr == '(' || *ptr == ')' ||
-                   *ptr == '<' || *ptr == '>') {
-            curr = newToken(TokenKind::Op, curr, line, ptr++, 1);
         } else if (std::isdigit(*ptr)) {
+            // If the first character is a digit, it's a number.
             curr = newToken(TokenKind::Num, curr, line, ptr, 0);
-            curr->val = strtol(ptr, &ptr, 10);
+            curr->val = std::strtol(ptr, &ptr, 10);
+        } else if (!std::strncmp(ptr, "==", 2) || !std::strncmp(ptr, "!=", 2) ||
+                   !std::strncmp(ptr, "<=", 2) || !std::strncmp(ptr, ">=", 2)) {
+            curr = newToken(TokenKind::Res, curr, line, ptr, 2);
+            ptr += 2;
+        } else if (std::strchr("+-*/<>=;", *ptr)) {
+            curr = newToken(TokenKind::Res, curr, line, ptr++, 1);
         } else {
             compilationError(line, ptr, "Unexpected character.");
         }
@@ -33,9 +34,9 @@ Token* tokenize(char* source) {
 }
 
 bool consume(Token*& token, const char* op) {
-    if (token->kind != TokenKind::Op ||
-        token->len != strlen(op) ||
-        strncmp(token->str, op, token->len) != 0) {
+    if (token->kind != TokenKind::Res ||
+        token->len != std::strlen(op) ||
+        std::strncmp(token->str, op, token->len)) {
         return false;
     }
     token = token->next;
