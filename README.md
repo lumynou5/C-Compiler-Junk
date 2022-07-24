@@ -14,4 +14,4 @@ C-Compiler "10 + (4 - 3) * 7 + -1" # The result is 16.
 The available operators include addition, subtraction, multiplication, division,
 unary plus, unary minus, relational operators, and equality operators.
 
-The assembly will be output into stdout.
+The program will output LLVM IR into stdout.

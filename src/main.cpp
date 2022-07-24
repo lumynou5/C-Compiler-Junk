@@ -16,12 +16,7 @@ int main(int argc, char** argv) {
     Node* node = parse(token);
 
     // Generate.
-    std::cout << ".intel_syntax noprefix\n"
-                 ".globl main\n"
-                 "main:\n"
-              << generate(node)
-              << "    pop rax\n"
-                 "    ret\n";
+    std::cout << Generator(node).getIR();
 
     return EXIT_SUCCESS;
 }

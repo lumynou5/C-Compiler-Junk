@@ -96,7 +96,7 @@ Node* unary(Token*& token) {
 
 Node* primary(Token*& token) {
     if (consume(token, "(")) {
-        Node* node = add(token);
+        Node* node = expr(token);
         if (!consume(token, ")")) {
             compilationError(token->line, token->str, "Expected `)`.");
         }
