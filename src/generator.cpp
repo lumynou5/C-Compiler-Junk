@@ -30,16 +30,28 @@ llvm::Value* Generator::generate(Node* node) {
 
     switch (node->kind) {
         case NodeKind::Eq:
-            builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_EQ, lhs, rhs);
+            builder.CreateZExt(
+                    builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_EQ, lhs, rhs),
+                    builder.getInt32Ty()
+                    );
             break;
         case NodeKind::NotEq:
-            builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_NE, lhs, rhs);
+            builder.CreateZExt(
+                    builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_NE, lhs, rhs),
+                    builder.getInt32Ty()
+            );
             break;
         case NodeKind::Less:
-            builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SLT, lhs, rhs);
+            builder.CreateZExt(
+                    builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SLT, lhs, rhs),
+                    builder.getInt32Ty()
+            );
             break;
         case NodeKind::LessEq:
-            builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SLE, lhs, rhs);
+            builder.CreateZExt(
+                    builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SLE, lhs, rhs),
+                    builder.getInt32Ty()
+            );
             break;
         case NodeKind::Add:
             builder.CreateAdd(lhs, rhs);
