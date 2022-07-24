@@ -23,7 +23,7 @@ Token* tokenize(char* source) {
                    !std::strncmp(ptr, "<=", 2) || !std::strncmp(ptr, ">=", 2)) {
             curr = newToken(TokenKind::Res, curr, line, ptr, 2);
             ptr += 2;
-        } else if (std::strchr("+-*/<>=", *ptr)) {
+        } else if (std::strchr("+-*/<>()", *ptr)) {
             curr = newToken(TokenKind::Res, curr, line, ptr++, 1);
         } else {
             compilationError(line, ptr, "Unexpected character.");
