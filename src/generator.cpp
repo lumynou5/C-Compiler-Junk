@@ -1,57 +1,59 @@
 #include "generator.h"
 
-#include <fmt/format.h>
+Generator::Generator(Node* node) : node(node), builder(context) {
+    auto main = llvm::Function::Create(
+            llvm::FunctionType::get(builder.getInt32Ty(), false),
+            llvm::GlobalValue::ExternalLinkage,
+            "main");
+    auto entry = llvm::BasicBlock::Create(context, "entry", main);
+    builder.SetInsertPoint(entry);
 
-std::string generate(Node* node) {
-    std::string result;
+    auto ret = generate(node);
 
-    // If the root is a number, then the syntax tree consists of the root only.
+    builder.CreateRet(ret);
+
+    llvm::raw_string_ostream out(ir);
+    main->print(out);
+}
+
+std::string_view Generator::getIR() {
+    return ir;
+}
+
+llvm::Value* Generator::generate(Node* node) {
     if (node->kind == NodeKind::Num) {
-        result += fmt::format("    push {}\n", node->val);
-        return result;
+        return builder.getInt32(node->val);
     }
 
-    result += generate(node->lhs);
-    result += generate(node->rhs);
-
-    result += "    pop rdi\n"
-              "    pop rax\n";
+    auto lhs = generate(node->lhs);
+    auto rhs = generate(node->rhs);
 
     switch (node->kind) {
         case NodeKind::Eq:
-            result += "    cmp rax, rdi\n"
-                      "    sete al\n"
-                      "    movzb rax, al\n";
+            builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_EQ, lhs, rhs);
             break;
         case NodeKind::NotEq:
-            result += "    cmp rax, rdi\n"
-                      "    setne al\n"
-                      "    movzb rax, al\n";
+            builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_NE, lhs, rhs);
             break;
         case NodeKind::Less:
-            result += "    cmp rax, rdi\n"
-                      "    setl al\n"
-                      "    movzb rax, al\n";
+            builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SLT, lhs, rhs);
             break;
         case NodeKind::LessEq:
-            result += "    cmp rax, rdi\n"
-                      "    setle al\n"
-                      "    movzb rax, al\n";
+            builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SLE, lhs, rhs);
             break;
         case NodeKind::Add:
-            result += "    add rax, rdi\n";
+            builder.CreateAdd(lhs, rhs);
             break;
         case NodeKind::Sub:
-            result += "    sub rax, rdi\n";
+            builder.CreateSub(lhs, rhs);
             break;
         case NodeKind::Mul:
-            result += "    imul rax, rdi\n";
+            builder.CreateMul(lhs, rhs);
             break;
         case NodeKind::Div:
-            result += "    cqo\n"
-                      "    idiv rdi\n";
+            builder.CreateSDiv(lhs, rhs);
+            break;
+        default:
             break;
     }
-
-    result += "    push rax\n";
 }
