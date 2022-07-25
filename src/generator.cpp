@@ -1,15 +1,16 @@
 #include "generator.h"
 
-Generator::Generator(Node* node) : node(node), builder(context) {
+Generator::Generator(Node* node) : builder(context) {
+    llvm::Module module("module", context);
     auto main = llvm::Function::Create(
             llvm::FunctionType::get(builder.getInt32Ty(), false),
-            llvm::GlobalValue::ExternalLinkage,
-            "main");
+            llvm::Function::ExternalLinkage,
+            "main",
+            module);
     auto entry = llvm::BasicBlock::Create(context, "entry", main);
     builder.SetInsertPoint(entry);
 
-    auto ret = generate(node);
-
+    auto ret = builder.CreateLoad(builder.getInt32Ty(), generate(node));
     builder.CreateRet(ret);
 
     llvm::raw_string_ostream out(ir);
@@ -21,6 +22,15 @@ std::string_view Generator::getIR() {
 }
 
 llvm::Value* Generator::generate(Node* node) {
+    if (node->kind == NodeKind::State) {
+        llvm::Value* reg = builder.CreateAlloca(builder.getInt32Ty());
+        builder.CreateStore(generate(node->lhs), reg);
+        if (node->rhs != nullptr) {
+            reg = generate(node->rhs);
+        }
+        return reg;
+    }
+
     if (node->kind == NodeKind::Num) {
         return builder.getInt32(node->val);
     }
@@ -30,41 +40,33 @@ llvm::Value* Generator::generate(Node* node) {
 
     switch (node->kind) {
         case NodeKind::Eq:
-            builder.CreateZExt(
-                    builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_EQ, lhs, rhs),
+            return builder.CreateZExt(
+                    builder.CreateICmpEQ(lhs, rhs),
                     builder.getInt32Ty()
-                    );
-            break;
+            );
         case NodeKind::NotEq:
-            builder.CreateZExt(
-                    builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_NE, lhs, rhs),
+            return builder.CreateZExt(
+                    builder.CreateICmpNE(lhs, rhs),
                     builder.getInt32Ty()
             );
-            break;
         case NodeKind::Less:
-            builder.CreateZExt(
-                    builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SLT, lhs, rhs),
+            return builder.CreateZExt(
+                    builder.CreateICmpSLT(lhs, rhs),
                     builder.getInt32Ty()
             );
-            break;
         case NodeKind::LessEq:
-            builder.CreateZExt(
-                    builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SLE, lhs, rhs),
+            return builder.CreateZExt(
+                    builder.CreateICmpSLE(lhs, rhs),
                     builder.getInt32Ty()
             );
-            break;
         case NodeKind::Add:
-            builder.CreateAdd(lhs, rhs);
-            break;
+            return builder.CreateAdd(lhs, rhs);
         case NodeKind::Sub:
-            builder.CreateSub(lhs, rhs);
-            break;
+            return builder.CreateSub(lhs, rhs);
         case NodeKind::Mul:
-            builder.CreateMul(lhs, rhs);
-            break;
+            return builder.CreateMul(lhs, rhs);
         case NodeKind::Div:
-            builder.CreateSDiv(lhs, rhs);
-            break;
+            return builder.CreateSDiv(lhs, rhs);
         default:
             break;
     }

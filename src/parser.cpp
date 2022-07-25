@@ -17,7 +17,19 @@ Node* newNumNode(long val) {
 }
 
 Node* parse(Token* token) {
-    return expr(token);
+    return state(token);
+}
+
+Node* state(Token*& token) {
+    if (token->kind == TokenKind::Eof) {
+        return nullptr;
+    }
+
+    Node* node = expr(token);
+    if (!consume(token, ";")) {
+        compilationError(token->line, token->str, "Expected `;`.");
+    }
+    return newNode(NodeKind::State, node, state(token));
 }
 
 Node* expr(Token*& token) {
