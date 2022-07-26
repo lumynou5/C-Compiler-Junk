@@ -4,6 +4,8 @@
 #include "tokenizer.h"
 
 enum class NodeKind {
+    // Statement.
+    State,
     // Equality.
     Eq,
     NotEq,
@@ -35,6 +37,12 @@ Node* newNumNode(long val);
 /// @param token The beginning of the token sequence.
 /// @return The root of the syntax tree.
 Node* parse(Token* token);
+
+/// @brief Parse tokens to get the syntax tree of a statement sequence.
+/// EBNF: state = expr ";"
+/// @param token The beginning of a statement sequence.
+/// @return The root of the syntax tree.
+Node* state(Token*& token);
 
 /// @brief Parse tokens to get the syntax tree of an expression.
 /// @param token The beginning of an expression.

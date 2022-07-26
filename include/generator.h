@@ -17,7 +17,6 @@ public:
 private:
     llvm::Value* generate(Node* node);
 
-    Node* node;
     std::string ir;
     llvm::LLVMContext context;
     llvm::IRBuilder<> builder;
