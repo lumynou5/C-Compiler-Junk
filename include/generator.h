@@ -12,14 +12,14 @@ public:
     Generator(const Generator&) = delete;
     Generator& operator =(const Generator&) = delete;
 
+    ~Generator();
+
     std::string_view getIR();
 
 private:
-    llvm::Value* generate(Node* node);
-
     std::string ir;
     llvm::LLVMContext context;
-    llvm::IRBuilder<> builder;
+    llvm::IRBuilder<>* builder;
 };
 
 #endif //C_COMPILER_GENERATOR_H

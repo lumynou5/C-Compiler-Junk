@@ -1,12 +1,12 @@
 #include "parser.h"
 
-#include "error.h"
+#include "error.hpp"
 
 Node* parse(Token* token) {
-    return state(token);
+    return normal_state(token);
 }
 
-StateNode* state(Token*& token) {
+StateNode* normal_state(Token*& token) {
     if (token->kind == TokenKind::Eof) {
         return nullptr;
     }
@@ -15,7 +15,7 @@ StateNode* state(Token*& token) {
     if (!consume(token, ";")) {
         compilationError(token->line, token->str, "Expected `;`.");
     }
-    return new StateNode(node, state(token));
+    return new NormalStateNode(node, normal_state(token));
 }
 
 ExprNode* expr(Token*& token) {
@@ -27,9 +27,9 @@ ExprNode* eq(Token*& token) {
 
     while (true) {
         if (consume(token, "==")) {
-            node = new BinaryOpNode(BinaryOpNode::Eq, node, rel(token));
+            node = new EqNode(node, rel(token));
         } else if (consume(token, "!=")) {
-            node = new BinaryOpNode(BinaryOpNode::NotEq, node, rel(token));
+            node = new NotEqNode(node, rel(token));
         } else {
             return node;
         }
@@ -41,13 +41,13 @@ ExprNode* rel(Token*& token) {
 
     while (true) {
         if (consume(token, "<=")) {
-            node = new BinaryOpNode(BinaryOpNode::LessEq, node, add(token));
+            node = new LessEqNode(node, add(token));
         } else if (consume(token, ">=")) {
-            node = new BinaryOpNode(BinaryOpNode::LessEq, add(token), node);
+            node = new LessEqNode(add(token), node);
         } else if (consume(token, "<")) {
-            node = new BinaryOpNode(BinaryOpNode::Less, node, add(token));
+            node = new LessNode(node, add(token));
         } else if (consume(token, ">")) {
-            node = new BinaryOpNode(BinaryOpNode::Less, add(token), node);
+            node = new LessNode(add(token), node);
         } else {
             return node;
         }
@@ -59,9 +59,9 @@ ExprNode* add(Token*& token) {
 
     while (true) {
         if (consume(token, "+")) {
-            node = new BinaryOpNode(BinaryOpNode::Add, node, mul(token));
+            node = new AddNode(node, mul(token));
         } else if (consume(token, "-")) {
-            node = new BinaryOpNode(BinaryOpNode::Sub, node, mul(token));
+            node = new SubNode(node, mul(token));
         } else {
             return node;
         }
@@ -73,9 +73,9 @@ ExprNode* mul(Token*& token) {
 
     while (true) {
         if (consume(token, "*")) {
-            node = new BinaryOpNode(BinaryOpNode::Mul, node, unary(token));
+            node = new MulNode(node, unary(token));
         } else if (consume(token, "/")) {
-            node = new BinaryOpNode(BinaryOpNode::Div, node, unary(token));
+            node = new DivNode(node, unary(token));
         } else {
             return node;
         }
@@ -86,7 +86,7 @@ ExprNode* unary(Token*& token) {
     if (consume(token, "+")) {
         return primary(token);
     } else if (consume(token, "-")) {
-        return new BinaryOpNode(BinaryOpNode::Sub, new NumberNode(0), primary(token));
+        return new SubNode(new NumNode(0), primary(token));
     }
 
     return primary(token);
@@ -101,5 +101,5 @@ ExprNode* primary(Token*& token) {
         return node;
     }
 
-    return new NumberNode(expectNumber(token));
+    return new NumNode(expectNumber(token));
 }

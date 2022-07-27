@@ -1,7 +1,9 @@
 #ifndef C_COMPILER_PARSER_H
 #define C_COMPILER_PARSER_H
 
-#include "syntax_tree.h"
+#include "ast/binary_op_node.h"
+#include "ast/primary_node.h"
+#include "ast/state_node.h"
 #include "tokenizer.h"
 
 /// @brief Parse tokens to get the syntax tree.
@@ -10,10 +12,10 @@
 Node* parse(Token* token);
 
 /// @brief Parse tokens to get the syntax tree of a statement sequence.
-/// EBNF: state = (expr ";")*
+/// EBNF: normal_state = (expr ";")*
 /// @param token The beginning of a statement sequence.
 /// @return The root of the syntax tree.
-StateNode* state(Token*& token);
+StateNode* normal_state(Token*& token);
 
 /// @brief Parse tokens to get the syntax tree of an expression.
 /// @param token The beginning of an expression.
@@ -51,7 +53,7 @@ ExprNode* mul(Token*& token);
 ExprNode* unary(Token*& token);
 
 /// @brief Parse tokens to get the syntax tree of a primary subexpression.
-/// EBNF: "(" add ")" | num
+/// EBNF: "(" expr ")" | num
 /// @param token The beginning of a subexpression.
 /// @return The root of the syntax tree.
 ExprNode* primary(Token*& token);
