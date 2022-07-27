@@ -9,8 +9,8 @@ class Generator {
 public:
     explicit Generator(Node* node);
 
-    Generator(const Node&) = delete;
-    Generator& operator =(const Node&) = delete;
+    Generator(const Generator&) = delete;
+    Generator& operator =(const Generator&) = delete;
 
     std::string_view getIR();
 

@@ -2,120 +2,104 @@
 
 #include "error.h"
 
-Node* newNode(NodeKind kind, Node* lhs, Node* rhs) {
-    auto* node = new Node;
-    node->kind = kind;
-    node->lhs = lhs;
-    node->rhs = rhs;
-    return node;
-}
-
-Node* newNumNode(long val) {
-    auto* node = newNode(NodeKind::Num, nullptr, nullptr);
-    node->val = val;
-    return node;
-}
-
 Node* parse(Token* token) {
     return state(token);
 }
 
-Node* state(Token*& token) {
+StateNode* state(Token*& token) {
     if (token->kind == TokenKind::Eof) {
         return nullptr;
     }
 
-    Node* node = expr(token);
+    auto node = expr(token);
     if (!consume(token, ";")) {
         compilationError(token->line, token->str, "Expected `;`.");
     }
-    return newNode(NodeKind::State, node, state(token));
+    return new StateNode(node, state(token));
 }
 
-Node* expr(Token*& token) {
+ExprNode* expr(Token*& token) {
     return eq(token);
 }
 
-Node* eq(Token*& token) {
-    Node* node = rel(token);
+ExprNode* eq(Token*& token) {
+    auto node = rel(token);
 
     while (true) {
         if (consume(token, "==")) {
-            node = newNode(NodeKind::Eq, node, rel(token));
+            node = new BinaryOpNode(BinaryOpNode::Eq, node, rel(token));
         } else if (consume(token, "!=")) {
-            node = newNode(NodeKind::NotEq, node, rel(token));
+            node = new BinaryOpNode(BinaryOpNode::NotEq, node, rel(token));
         } else {
             return node;
         }
     }
 }
 
-Node* rel(Token*& token) {
-    Node* node = add(token);
+ExprNode* rel(Token*& token) {
+    auto node = add(token);
 
     while (true) {
         if (consume(token, "<=")) {
-            node = newNode(NodeKind::LessEq, node, add(token));
+            node = new BinaryOpNode(BinaryOpNode::LessEq, node, add(token));
         } else if (consume(token, ">=")) {
-            node = newNode(NodeKind::LessEq, add(token), node);
+            node = new BinaryOpNode(BinaryOpNode::LessEq, add(token), node);
         } else if (consume(token, "<")) {
-            node = newNode(NodeKind::Less, node, add(token));
+            node = new BinaryOpNode(BinaryOpNode::Less, node, add(token));
         } else if (consume(token, ">")) {
-            node = newNode(NodeKind::Less, add(token), node);
+            node = new BinaryOpNode(BinaryOpNode::Less, add(token), node);
         } else {
             return node;
         }
     }
 }
 
-Node* add(Token*& token) {
-    Node* node = mul(token);
+ExprNode* add(Token*& token) {
+    auto node = mul(token);
 
     while (true) {
         if (consume(token, "+")) {
-            node = newNode(NodeKind::Add, node, mul(token));
+            node = new BinaryOpNode(BinaryOpNode::Add, node, mul(token));
         } else if (consume(token, "-")) {
-            node = newNode(NodeKind::Sub, node, mul(token));
+            node = new BinaryOpNode(BinaryOpNode::Sub, node, mul(token));
         } else {
             return node;
         }
     }
 }
 
-Node* mul(Token*& token) {
-    Node* node = unary(token);
+ExprNode* mul(Token*& token) {
+    auto node = unary(token);
 
     while (true) {
         if (consume(token, "*")) {
-            node = newNode(NodeKind::Mul, node, unary(token));
+            node = new BinaryOpNode(BinaryOpNode::Mul, node, unary(token));
         } else if (consume(token, "/")) {
-            node = newNode(NodeKind::Div, node, unary(token));
+            node = new BinaryOpNode(BinaryOpNode::Div, node, unary(token));
         } else {
             return node;
         }
     }
 }
 
-Node* unary(Token*& token) {
+ExprNode* unary(Token*& token) {
     if (consume(token, "+")) {
         return primary(token);
     } else if (consume(token, "-")) {
-        return newNode(NodeKind::Sub, newNumNode(0), primary(token));
+        return new BinaryOpNode(BinaryOpNode::Sub, new NumberNode(0), primary(token));
     }
 
     return primary(token);
 }
 
-Node* primary(Token*& token) {
+ExprNode* primary(Token*& token) {
     if (consume(token, "(")) {
-        Node* node = expr(token);
+        auto node = expr(token);
         if (!consume(token, ")")) {
             compilationError(token->line, token->str, "Expected `)`.");
         }
         return node;
     }
 
-    Node* node = newNode(NodeKind::Num, nullptr, nullptr);
-    node->val = expectNumber(token);
-    return node;
+    return new NumberNode(expectNumber(token));
 }
