@@ -57,13 +57,17 @@ llvm::Value* Generator::generate(Node* node) {
             case BinaryOpNode::Sub:
                 return builder.CreateSub(lhs, rhs);
             case BinaryOpNode::Less:
-                return builder.CreateICmpSLT(lhs, rhs);
+                return builder.CreateZExt(builder.CreateICmpSLT(lhs, rhs),
+                                          builder.getInt32Ty());
             case BinaryOpNode::LessEq:
-                return builder.CreateICmpSLE(lhs, rhs);
+                return builder.CreateZExt(builder.CreateICmpSLE(lhs, rhs),
+                                          builder.getInt32Ty());
             case BinaryOpNode::Eq:
-                return builder.CreateICmpEQ(lhs, rhs);
+                return builder.CreateZExt(builder.CreateICmpEQ(lhs, rhs),
+                                          builder.getInt32Ty());
             case BinaryOpNode::NotEq:
-                return builder.CreateICmpNE(lhs, rhs);
+                return builder.CreateZExt(builder.CreateICmpNE(lhs, rhs),
+                                          builder.getInt32Ty());
         }
     }
 }
