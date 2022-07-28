@@ -5,9 +5,9 @@
 #include <fmt/format.h>
 
 enum class TokenKind {
-    Res, // Reserved.
-    Num, // Number.
-    Eof  // End of file.
+    Res, ///< Reserved.
+    Num, ///< Number.
+    Eof, ///< End of file.
 };
 
 struct Token {
