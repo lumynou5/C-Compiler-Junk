@@ -122,7 +122,12 @@ ExprNode* Parser::primary() {
         return node;
     }
 
+    Token* variable = token;
     if (auto id = consumeId(token); !id.empty()) {
+        if (std::find(variables.begin(), variables.end(), id) == variables.end()) {
+            compilationError(variable->line, variable->str, "Undefined variable.");
+        }
+
         return new VarLoadNode(id);
     }
 

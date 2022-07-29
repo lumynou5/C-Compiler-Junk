@@ -1,6 +1,7 @@
 #ifndef C_COMPILER_PARSER_H
 #define C_COMPILER_PARSER_H
 
+#include <map>
 #include "ast/binary_op_node.h"
 #include "ast/primary_node.h"
 #include "ast/state_node.h"
@@ -81,6 +82,7 @@ private:
 
     Token* token;
     Node* ast;
+    std::vector<std::string> variables;
 };
 
 #endif //C_COMPILER_PARSER_H
