@@ -1,105 +1,135 @@
 #include "parser.h"
 
-#include "error.h"
+#include "error.hpp"
 
-Node* parse(Token* token) {
-    return state(token);
+Parser::Parser(Token* token) : token(token) {
+    ast = normal_state();
 }
 
-StateNode* state(Token*& token) {
+Parser::~Parser() {
+    delete ast;
+}
+
+Node* Parser::getAST() {
+    return ast;
+}
+
+StateNode* Parser::normal_state() {
     if (token->kind == TokenKind::Eof) {
         return nullptr;
     }
 
-    auto node = expr(token);
+    auto node = expr();
     if (!consume(token, ";")) {
         compilationError(token->line, token->str, "Expected `;`.");
     }
-    return new StateNode(node, state(token));
+    return new NormalStateNode(node, normal_state());
 }
 
-ExprNode* expr(Token*& token) {
-    return eq(token);
+ExprNode* Parser::expr() {
+    return assign();
 }
 
-ExprNode* eq(Token*& token) {
-    auto node = rel(token);
+ExprNode* Parser::assign() {
+    Token* previous = token;
+
+    if (auto id = consumeId(token); !id.empty()) {
+        if (consume(token, "=")) {
+            return new AssignNode(new VarStoreNode(id), eq());
+        }
+    }
+
+    token = previous;
+    return eq();
+}
+
+ExprNode* Parser::eq() {
+    auto node = rel();
 
     while (true) {
         if (consume(token, "==")) {
-            node = new BinaryOpNode(BinaryOpNode::Eq, node, rel(token));
+            node = new EqNode(node, rel());
         } else if (consume(token, "!=")) {
-            node = new BinaryOpNode(BinaryOpNode::NotEq, node, rel(token));
+            node = new NotEqNode(node, rel());
         } else {
             return node;
         }
     }
 }
 
-ExprNode* rel(Token*& token) {
-    auto node = add(token);
+ExprNode* Parser::rel() {
+    auto node = add();
 
     while (true) {
         if (consume(token, "<=")) {
-            node = new BinaryOpNode(BinaryOpNode::LessEq, node, add(token));
+            node = new LessEqNode(node, add());
         } else if (consume(token, ">=")) {
-            node = new BinaryOpNode(BinaryOpNode::LessEq, add(token), node);
+            node = new LessEqNode(add(), node);
         } else if (consume(token, "<")) {
-            node = new BinaryOpNode(BinaryOpNode::Less, node, add(token));
+            node = new LessNode(node, add());
         } else if (consume(token, ">")) {
-            node = new BinaryOpNode(BinaryOpNode::Less, add(token), node);
+            node = new LessNode(add(), node);
         } else {
             return node;
         }
     }
 }
 
-ExprNode* add(Token*& token) {
-    auto node = mul(token);
+ExprNode* Parser::add() {
+    auto node = mul();
 
     while (true) {
         if (consume(token, "+")) {
-            node = new BinaryOpNode(BinaryOpNode::Add, node, mul(token));
+            node = new AddNode(node, mul());
         } else if (consume(token, "-")) {
-            node = new BinaryOpNode(BinaryOpNode::Sub, node, mul(token));
+            node = new SubNode(node, mul());
         } else {
             return node;
         }
     }
 }
 
-ExprNode* mul(Token*& token) {
-    auto node = unary(token);
+ExprNode* Parser::mul() {
+    auto node = unary();
 
     while (true) {
         if (consume(token, "*")) {
-            node = new BinaryOpNode(BinaryOpNode::Mul, node, unary(token));
+            node = new MulNode(node, unary());
         } else if (consume(token, "/")) {
-            node = new BinaryOpNode(BinaryOpNode::Div, node, unary(token));
+            node = new DivNode(node, unary());
         } else {
             return node;
         }
     }
 }
 
-ExprNode* unary(Token*& token) {
+ExprNode* Parser::unary() {
     if (consume(token, "+")) {
-        return primary(token);
+        return primary();
     } else if (consume(token, "-")) {
-        return new BinaryOpNode(BinaryOpNode::Sub, new NumberNode(0), primary(token));
+        return new SubNode(new NumNode(0), primary());
     }
 
-    return primary(token);
+    return primary();
 }
 
-ExprNode* primary(Token*& token) {
+ExprNode* Parser::primary() {
     if (consume(token, "(")) {
-        auto node = expr(token);
+        auto node = expr();
         if (!consume(token, ")")) {
             compilationError(token->line, token->str, "Expected `)`.");
         }
         return node;
     }
 
-    return new NumberNode(expectNumber(token));
+    Token* variable = token;
+    if (auto id = consumeId(token); !id.empty()) {
+        if (std::find(variables.begin(), variables.end(), id) == variables.end()) {
+            compilationError(variable->line, variable->str, "Undefined variable.");
+        }
+
+        return new VarLoadNode(id);
+    }
+
+    return new NumNode(expectNumber(token));
 }

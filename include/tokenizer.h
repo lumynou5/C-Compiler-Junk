@@ -5,9 +5,10 @@
 #include <fmt/format.h>
 
 enum class TokenKind {
-    Res, // Reserved.
-    Num, // Number.
-    Eof  // End of file.
+    Res, ///< Reserved.
+    Id,  ///< Identifier.
+    Num, ///< Number.
+    Eof, ///< End of file.
 };
 
 struct Token {
@@ -22,6 +23,8 @@ struct Token {
 Token* tokenize(char* source);
 
 bool consume(Token*& token, const char* op);
+
+std::string consumeId(Token*& token);
 
 long expectNumber(Token*& token);
 
