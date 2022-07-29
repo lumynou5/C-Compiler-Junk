@@ -25,8 +25,11 @@ Token* tokenize(char* source) {
             ptr += 2;
         } else if (std::strchr("+-*/<>()=;", *ptr)) {
             curr = newToken(TokenKind::Res, curr, line, ptr++, 1);
-        } else if (std::isalpha(*ptr)) {
-            curr = newToken(TokenKind::Id, curr, line, ptr++, 1);
+        } else if (std::isalpha(*ptr) || *ptr == '_') {
+            char* last = ptr;
+            for (; std::isalnum(*last) || *last == '_'; ++last);
+            curr = newToken(TokenKind::Id, curr, line, ptr, static_cast<std::size_t>(last - ptr));
+            ptr = last;
         } else {
             compilationError(line, ptr, "Unexpected character.");
         }
