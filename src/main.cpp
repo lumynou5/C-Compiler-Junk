@@ -13,15 +13,13 @@ int main(int argc, char** argv) {
     Token* token = tokenize(argv[1]);
 
     // Parse.
-    Node* node = parse(token);
+    Parser parser(token);
 
     // Generate.
-    std::cout << ".intel_syntax noprefix\n"
-                 ".globl main\n"
-                 "main:\n"
-              << generate(node)
-              << "    pop rax\n"
-                 "    ret\n";
+    Generator generator(parser.getAST());
+
+    // Output.
+    std::cout << generator.getIR();
 
     return EXIT_SUCCESS;
 }

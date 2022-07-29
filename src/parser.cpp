@@ -1,109 +1,135 @@
 #include "parser.h"
 
-#include "error.h"
+#include "error.hpp"
 
-Node* newNode(NodeKind kind, Node* lhs, Node* rhs) {
-    auto* node = new Node;
-    node->kind = kind;
-    node->lhs = lhs;
-    node->rhs = rhs;
-    return node;
+Parser::Parser(Token* token) : token(token) {
+    ast = normal_state();
 }
 
-Node* newNumNode(long val) {
-    auto* node = newNode(NodeKind::Num, nullptr, nullptr);
-    node->val = val;
-    return node;
+Parser::~Parser() {
+    delete ast;
 }
 
-Node* parse(Token* token) {
-    return expr(token);
+Node* Parser::getAST() {
+    return ast;
 }
 
-Node* expr(Token*& token) {
-    return eq(token);
+StateNode* Parser::normal_state() {
+    if (token->kind == TokenKind::Eof) {
+        return nullptr;
+    }
+
+    auto node = expr();
+    if (!consume(token, ";")) {
+        compilationError(token->line, token->str, "Expected `;`.");
+    }
+    return new NormalStateNode(node, normal_state());
 }
 
-Node* eq(Token*& token) {
-    Node* node = rel(token);
+ExprNode* Parser::expr() {
+    return assign();
+}
+
+ExprNode* Parser::assign() {
+    Token* previous = token;
+
+    if (auto id = consumeId(token); !id.empty()) {
+        if (consume(token, "=")) {
+            return new AssignNode(new VarStoreNode(id), eq());
+        }
+    }
+
+    token = previous;
+    return eq();
+}
+
+ExprNode* Parser::eq() {
+    auto node = rel();
 
     while (true) {
         if (consume(token, "==")) {
-            node = newNode(NodeKind::Eq, node, rel(token));
+            node = new EqNode(node, rel());
         } else if (consume(token, "!=")) {
-            node = newNode(NodeKind::NotEq, node, rel(token));
+            node = new NotEqNode(node, rel());
         } else {
             return node;
         }
     }
 }
 
-Node* rel(Token*& token) {
-    Node* node = add(token);
+ExprNode* Parser::rel() {
+    auto node = add();
 
     while (true) {
         if (consume(token, "<=")) {
-            node = newNode(NodeKind::LessEq, node, add(token));
+            node = new LessEqNode(node, add());
         } else if (consume(token, ">=")) {
-            node = newNode(NodeKind::LessEq, add(token), node);
+            node = new LessEqNode(add(), node);
         } else if (consume(token, "<")) {
-            node = newNode(NodeKind::Less, node, add(token));
+            node = new LessNode(node, add());
         } else if (consume(token, ">")) {
-            node = newNode(NodeKind::Less, add(token), node);
+            node = new LessNode(add(), node);
         } else {
             return node;
         }
     }
 }
 
-Node* add(Token*& token) {
-    Node* node = mul(token);
+ExprNode* Parser::add() {
+    auto node = mul();
 
     while (true) {
         if (consume(token, "+")) {
-            node = newNode(NodeKind::Add, node, mul(token));
+            node = new AddNode(node, mul());
         } else if (consume(token, "-")) {
-            node = newNode(NodeKind::Sub, node, mul(token));
+            node = new SubNode(node, mul());
         } else {
             return node;
         }
     }
 }
 
-Node* mul(Token*& token) {
-    Node* node = unary(token);
+ExprNode* Parser::mul() {
+    auto node = unary();
 
     while (true) {
         if (consume(token, "*")) {
-            node = newNode(NodeKind::Mul, node, unary(token));
+            node = new MulNode(node, unary());
         } else if (consume(token, "/")) {
-            node = newNode(NodeKind::Div, node, unary(token));
+            node = new DivNode(node, unary());
         } else {
             return node;
         }
     }
 }
 
-Node* unary(Token*& token) {
+ExprNode* Parser::unary() {
     if (consume(token, "+")) {
-        return primary(token);
+        return primary();
     } else if (consume(token, "-")) {
-        return newNode(NodeKind::Sub, newNumNode(0), primary(token));
+        return new SubNode(new NumNode(0), primary());
     }
 
-    return primary(token);
+    return primary();
 }
 
-Node* primary(Token*& token) {
+ExprNode* Parser::primary() {
     if (consume(token, "(")) {
-        Node* node = add(token);
+        auto node = expr();
         if (!consume(token, ")")) {
             compilationError(token->line, token->str, "Expected `)`.");
         }
         return node;
     }
 
-    Node* node = newNode(NodeKind::Num, nullptr, nullptr);
-    node->val = expectNumber(token);
-    return node;
+    Token* variable = token;
+    if (auto id = consumeId(token); !id.empty()) {
+        if (std::find(variables.begin(), variables.end(), id) == variables.end()) {
+            compilationError(variable->line, variable->str, "Undefined variable.");
+        }
+
+        return new VarLoadNode(id);
+    }
+
+    return new NumNode(expectNumber(token));
 }

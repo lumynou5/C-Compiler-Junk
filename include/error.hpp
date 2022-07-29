@@ -1,5 +1,5 @@
-#ifndef C_COMPILER_ERROR_H
-#define C_COMPILER_ERROR_H
+#ifndef C_COMPILER_ERROR_HPP
+#define C_COMPILER_ERROR_HPP
 
 #include <cstdio>
 #include <fmt/format.h>
@@ -15,4 +15,4 @@ void compilationError(char* line, char* col, const char* fmt, const Args& ...arg
     std::exit(EXIT_FAILURE);
 }
 
-#endif //C_COMPILER_ERROR_H
+#endif //C_COMPILER_ERROR_HPP
