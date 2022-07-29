@@ -8,7 +8,9 @@ public:
     Node() = default;
 
     Node(const Node*) = delete;
-    Node& operator =(const Node* node) = delete;
+    Node& operator=(const Node*) = delete;
+
+    virtual ~Node() = default;
 
     virtual llvm::Value* generate(llvm::IRBuilder<>* builder) = 0;
 };

@@ -13,10 +13,13 @@ int main(int argc, char** argv) {
     Token* token = tokenize(argv[1]);
 
     // Parse.
-    Node* node = parse(token);
+    Parser parser(token);
 
     // Generate.
-    std::cout << Generator(node).getIR();
+    Generator generator(parser.getAST());
+
+    // Output.
+    std::cout << generator.getIR();
 
     return EXIT_SUCCESS;
 }

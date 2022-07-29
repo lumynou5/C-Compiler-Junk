@@ -7,6 +7,8 @@ class BinaryOpNode : public ExprNode {
 public:
     BinaryOpNode(ExprNode* lhs, ExprNode* rhs);
 
+    ~BinaryOpNode() override;
+
     ExprNode* lhs;
     ExprNode* rhs;
 };

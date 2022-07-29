@@ -3,6 +3,11 @@
 BinaryOpNode::BinaryOpNode(ExprNode* lhs, ExprNode* rhs)
         : lhs(lhs), rhs(rhs) {}
 
+BinaryOpNode::~BinaryOpNode() {
+    delete lhs;
+    delete rhs;
+}
+
 llvm::Value* MulNode::generate(llvm::IRBuilder<>* builder) {
     return builder->CreateMul(lhs->generate(builder), rhs->generate(builder));
 }

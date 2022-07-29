@@ -2,112 +2,120 @@
 
 #include "error.hpp"
 
-Node* parse(Token* token) {
-    return normal_state(token);
+Parser::Parser(Token* token) : token(token) {
+    ast = normal_state();
 }
 
-StateNode* normal_state(Token*& token) {
+Parser::~Parser() {
+    delete ast;
+}
+
+Node* Parser::getAST() {
+    return ast;
+}
+
+StateNode* Parser::normal_state() {
     if (token->kind == TokenKind::Eof) {
         return nullptr;
     }
 
-    auto node = expr(token);
+    auto node = expr();
     if (!consume(token, ";")) {
         compilationError(token->line, token->str, "Expected `;`.");
     }
-    return new NormalStateNode(node, normal_state(token));
+    return new NormalStateNode(node, normal_state());
 }
 
-ExprNode* expr(Token*& token) {
-    return assign(token);
+ExprNode* Parser::expr() {
+    return assign();
 }
 
-ExprNode* assign(Token*& token) {
+ExprNode* Parser::assign() {
     Token* previous = token;
 
     if (auto id = consumeId(token); !id.empty()) {
         if (consume(token, "=")) {
-            return new AssignNode(new VarStoreNode(id), eq(token));
+            return new AssignNode(new VarStoreNode(id), eq());
         }
     }
 
     token = previous;
-    return eq(token);
+    return eq();
 }
 
-ExprNode* eq(Token*& token) {
-    auto node = rel(token);
+ExprNode* Parser::eq() {
+    auto node = rel();
 
     while (true) {
         if (consume(token, "==")) {
-            node = new EqNode(node, rel(token));
+            node = new EqNode(node, rel());
         } else if (consume(token, "!=")) {
-            node = new NotEqNode(node, rel(token));
+            node = new NotEqNode(node, rel());
         } else {
             return node;
         }
     }
 }
 
-ExprNode* rel(Token*& token) {
-    auto node = add(token);
+ExprNode* Parser::rel() {
+    auto node = add();
 
     while (true) {
         if (consume(token, "<=")) {
-            node = new LessEqNode(node, add(token));
+            node = new LessEqNode(node, add());
         } else if (consume(token, ">=")) {
-            node = new LessEqNode(add(token), node);
+            node = new LessEqNode(add(), node);
         } else if (consume(token, "<")) {
-            node = new LessNode(node, add(token));
+            node = new LessNode(node, add());
         } else if (consume(token, ">")) {
-            node = new LessNode(add(token), node);
+            node = new LessNode(add(), node);
         } else {
             return node;
         }
     }
 }
 
-ExprNode* add(Token*& token) {
-    auto node = mul(token);
+ExprNode* Parser::add() {
+    auto node = mul();
 
     while (true) {
         if (consume(token, "+")) {
-            node = new AddNode(node, mul(token));
+            node = new AddNode(node, mul());
         } else if (consume(token, "-")) {
-            node = new SubNode(node, mul(token));
+            node = new SubNode(node, mul());
         } else {
             return node;
         }
     }
 }
 
-ExprNode* mul(Token*& token) {
-    auto node = unary(token);
+ExprNode* Parser::mul() {
+    auto node = unary();
 
     while (true) {
         if (consume(token, "*")) {
-            node = new MulNode(node, unary(token));
+            node = new MulNode(node, unary());
         } else if (consume(token, "/")) {
-            node = new DivNode(node, unary(token));
+            node = new DivNode(node, unary());
         } else {
             return node;
         }
     }
 }
 
-ExprNode* unary(Token*& token) {
+ExprNode* Parser::unary() {
     if (consume(token, "+")) {
-        return primary(token);
+        return primary();
     } else if (consume(token, "-")) {
-        return new SubNode(new NumNode(0), primary(token));
+        return new SubNode(new NumNode(0), primary());
     }
 
-    return primary(token);
+    return primary();
 }
 
-ExprNode* primary(Token*& token) {
+ExprNode* Parser::primary() {
     if (consume(token, "(")) {
-        auto node = expr(token);
+        auto node = expr();
         if (!consume(token, ")")) {
             compilationError(token->line, token->str, "Expected `)`.");
         }

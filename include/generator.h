@@ -10,7 +10,7 @@ public:
     explicit Generator(Node* node);
 
     Generator(const Generator&) = delete;
-    Generator& operator =(const Generator&) = delete;
+    Generator& operator=(const Generator&) = delete;
 
     ~Generator();
 

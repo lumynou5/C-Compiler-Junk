@@ -6,81 +6,81 @@
 #include "ast/state_node.h"
 #include "tokenizer.h"
 
-/// \brief Parse tokens to get the syntax tree.
-///
-/// \param token The beginning of the token sequence.
-/// \return The root of the syntax tree.
-Node* parse(Token* token);
+class Parser {
+public:
+    explicit Parser(Token* token);
 
-/// \brief Parse tokens to get the syntax tree of a statement sequence.
-///
-/// EBNF: normal_state = (expr ";")*
-///
-/// \param token The beginning of a statement sequence.
-/// \return The root of the syntax tree.
-StateNode* normal_state(Token*& token);
+    Parser(const Parser&) = delete;
+    Parser& operator=(const Parser&) = delete;
 
-/// \brief Parse tokens to get the syntax tree of an expression.
-///
-/// \param token The beginning of an expression.
-///
-/// \return The root of the syntax tree.
-ExprNode* expr(Token*& token);
+    ~Parser();
 
-/// \brief Parse tokens to get the syntax tree of an assignment subexpression.
-///
-/// EBNF: assign = var "=" eq
-///
-/// \param token The beginning of a subexpression.
-/// \return The root of the syntax tree.
-ExprNode* assign(Token*& token);
+    Node* getAST();
 
-/// \brief Parse tokens to get the syntax tree of an equality subexpression.
-///
-/// EBNF: eq = rel ("==" rel | "!=" rel)*
-///
-/// \param token The beginning of a subexpression.
-/// \return The root of the syntax tree.
-ExprNode* eq(Token*& token);
+private:
+    /// \brief Parse tokens to get the syntax tree of a statement sequence.
+    ///
+    /// EBNF: normal_state = (expr ";")*
+    ///
+    /// \return The root of the syntax tree.
+    StateNode* normal_state();
 
-/// \brief Parse tokens to get the syntax tree of a relation subexpression.
-///
-/// EBNF: rel = add ("<" add | "<=" add | ">" add | ">=" add)*
-///
-/// \param token The beginning of a subexpression.
-/// \return The root of the syntax tree.
-ExprNode* rel(Token*& token);
+    /// \brief Parse tokens to get the syntax tree of an expression.
+    ///
+    /// \return The root of the syntax tree.
+    ExprNode* expr();
 
-/// \brief Parse tokens to get the syntax tree of an addition subexpression.
-///
-/// EBNF: add = mul ("+" mul | "-" mul)*
-/// \param token The beginning of a subexpression.
-///
-/// \return The root of the syntax tree.
-ExprNode* add(Token*& token);
+    /// \brief Parse tokens to get the syntax tree of an assignment subexpression.
+    ///
+    /// EBNF: assign = var "=" eq
+    ///
+    /// \return The root of the syntax tree.
+    ExprNode* assign();
 
-/// \brief Parse tokens to get the syntax tree of a multiplication subexpression.
-///
-/// EBNF: mul = unary ("*" unary | "/" unary)*
-///
-/// \param token The beginning of a subexpression.
-/// \return The root of the syntax tree.
-ExprNode* mul(Token*& token);
+    /// \brief Parse tokens to get the syntax tree of an equality subexpression.
+    ///
+    /// EBNF: eq = rel ("==" rel | "!=" rel)*
+    ///
+    /// \return The root of the syntax tree.
+    ExprNode* eq();
 
-/// \brief Parse tokens to get the syntax tree of a unary subexpression.
-///
-/// EBNF: unary = ("+" | "-")? primary
-///
-/// \param token The beginning of a subexpression.
-/// \return The root of the syntax tree.
-ExprNode* unary(Token*& token);
+    /// \brief Parse tokens to get the syntax tree of a relation subexpression.
+    ///
+    /// EBNF: rel = add ("<" add | "<=" add | ">" add | ">=" add)*
+    ///
+    /// \return The root of the syntax tree.
+    ExprNode* rel();
 
-/// \brief Parse tokens to get the syntax tree of a primary subexpression.
-///
-/// EBNF: "(" expr ")" | var | num
-///
-/// \param token The beginning of a subexpression.
-/// \return The root of the syntax tree.
-ExprNode* primary(Token*& token);
+    /// \brief Parse tokens to get the syntax tree of an addition subexpression.
+    ///
+    /// EBNF: add = mul ("+" mul | "-" mul)*
+    ///
+    /// \return The root of the syntax tree.
+    ExprNode* add();
+
+    /// \brief Parse tokens to get the syntax tree of a multiplication subexpression.
+    ///
+    /// EBNF: mul = unary ("*" unary | "/" unary)*
+    ///
+    /// \return The root of the syntax tree.
+    ExprNode* mul();
+
+    /// \brief Parse tokens to get the syntax tree of a unary subexpression.
+    ///
+    /// EBNF: unary = ("+" | "-")? primary
+    ///
+    /// \return The root of the syntax tree.
+    ExprNode* unary();
+
+    /// \brief Parse tokens to get the syntax tree of a primary subexpression.
+    ///
+    /// EBNF: "(" expr ")" | var | num
+    ///
+    /// \return The root of the syntax tree.
+    ExprNode* primary();
+
+    Token* token;
+    Node* ast;
+};
 
 #endif //C_COMPILER_PARSER_H

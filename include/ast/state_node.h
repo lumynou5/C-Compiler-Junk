@@ -7,6 +7,8 @@ class NormalStateNode : public StateNode {
 public:
     NormalStateNode(ExprNode* content, StateNode* next);
 
+    ~NormalStateNode() override;
+
     llvm::Value* generate(llvm::IRBuilder<>* builder) override;
 
     ExprNode* content;

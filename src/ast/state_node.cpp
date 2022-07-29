@@ -11,3 +11,8 @@ llvm::Value* NormalStateNode::generate(llvm::IRBuilder<>* builder) {
         return val;
     }
 }
+
+NormalStateNode::~NormalStateNode() {
+    delete content;
+    delete next;
+}
