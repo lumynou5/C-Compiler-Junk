@@ -16,7 +16,7 @@ unary plus, unary minus, relational operators, and equality operators.
 
 The last statement of the given semicolon-split sequence is the return of the main function.
 
-You can use variables like `abc = 10; abc + 1;`.
-Trying to access a variable that hasn't assigned before is undefined behavior.
+You can use variables like `foo = 10; foo + 1;`.
+Trying to access a variable that hasn't assigned before causes compilation error.
 
 The program will output LLVM IR into stdout.
