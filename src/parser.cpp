@@ -35,6 +35,7 @@ ExprNode* Parser::assign() {
 
     if (auto id = consumeId(token); !id.empty()) {
         if (consume(token, "=")) {
+            variables.push_back(id);
             return new AssignNode(new VarStoreNode(id), eq());
         }
     }
