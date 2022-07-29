@@ -27,6 +27,14 @@ StateNode* normal_state(Token*& token);
 /// \return The root of the syntax tree.
 ExprNode* expr(Token*& token);
 
+/// \brief Parse tokens to get the syntax tree of an assignment subexpression.
+///
+/// EBNF: assign = var "=" eq
+///
+/// \param token The beginning of a subexpression.
+/// \return The root of the syntax tree.
+ExprNode* assign(Token*& token);
+
 /// \brief Parse tokens to get the syntax tree of an equality subexpression.
 ///
 /// EBNF: eq = rel ("==" rel | "!=" rel)*
@@ -69,7 +77,7 @@ ExprNode* unary(Token*& token);
 
 /// \brief Parse tokens to get the syntax tree of a primary subexpression.
 ///
-/// EBNF: "(" expr ")" | num
+/// EBNF: "(" expr ")" | var | num
 ///
 /// \param token The beginning of a subexpression.
 /// \return The root of the syntax tree.

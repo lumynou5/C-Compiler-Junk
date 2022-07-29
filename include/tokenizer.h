@@ -6,6 +6,7 @@
 
 enum class TokenKind {
     Res, ///< Reserved.
+    Id,  ///< Identifier.
     Num, ///< Number.
     Eof, ///< End of file.
 };
@@ -22,6 +23,8 @@ struct Token {
 Token* tokenize(char* source);
 
 bool consume(Token*& token, const char* op);
+
+std::string consumeId(Token*& token);
 
 long expectNumber(Token*& token);
 

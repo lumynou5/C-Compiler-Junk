@@ -42,3 +42,8 @@ llvm::Value* NotEqNode::generate(llvm::IRBuilder<>* builder) {
             builder->CreateICmpNE(lhs->generate(builder), rhs->generate(builder)),
             builder->getInt32Ty());
 }
+
+llvm::Value* AssignNode::generate(llvm::IRBuilder<>* builder) {
+    // The LHS operand is the variable.
+    return builder->CreateStore(rhs->generate(builder), lhs->generate(builder));
+}

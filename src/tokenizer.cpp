@@ -23,8 +23,10 @@ Token* tokenize(char* source) {
                    !std::strncmp(ptr, "<=", 2) || !std::strncmp(ptr, ">=", 2)) {
             curr = newToken(TokenKind::Res, curr, line, ptr, 2);
             ptr += 2;
-        } else if (std::strchr("+-*/<>();", *ptr)) {
+        } else if (std::strchr("+-*/<>()=;", *ptr)) {
             curr = newToken(TokenKind::Res, curr, line, ptr++, 1);
+        } else if (std::isalpha(*ptr)) {
+            curr = newToken(TokenKind::Id, curr, line, ptr++, 1);
         } else {
             compilationError(line, ptr, "Unexpected character.");
         }
@@ -39,8 +41,19 @@ bool consume(Token*& token, const char* op) {
         std::strncmp(token->str, op, token->len)) {
         return false;
     }
+
     token = token->next;
     return true;
+}
+
+std::string consumeId(Token*& token) {
+    if (token->kind != TokenKind::Id) {
+        return {};
+    }
+    std::string id(token->str, token->len);
+
+    token = token->next;
+    return id;
 }
 
 long expectNumber(Token*& token) {
@@ -48,6 +61,7 @@ long expectNumber(Token*& token) {
         compilationError(token->line, token->str, "Expected a number.");
     }
     long val = token->val;
+
     token = token->next;
     return val;
 }
@@ -59,6 +73,7 @@ Token* newToken(TokenKind kind, Token* parent, char* line, char* str, std::size_
     token->str = str;
     token->len = len;
     token->next = nullptr;
+
     parent->next = token;
     return token;
 }

@@ -19,6 +19,19 @@ StateNode* normal_state(Token*& token) {
 }
 
 ExprNode* expr(Token*& token) {
+    return assign(token);
+}
+
+ExprNode* assign(Token*& token) {
+    Token* previous = token;
+
+    if (auto id = consumeId(token); !id.empty()) {
+        if (consume(token, "=")) {
+            return new AssignNode(new VarStoreNode(id), eq(token));
+        }
+    }
+
+    token = previous;
     return eq(token);
 }
 
@@ -99,6 +112,10 @@ ExprNode* primary(Token*& token) {
             compilationError(token->line, token->str, "Expected `)`.");
         }
         return node;
+    }
+
+    if (auto id = consumeId(token); !id.empty()) {
+        return new VarLoadNode(id);
     }
 
     return new NumNode(expectNumber(token));

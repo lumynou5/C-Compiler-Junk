@@ -12,4 +12,22 @@ public:
     long val;
 };
 
+class VarStoreNode : public ExprNode {
+public:
+    explicit VarStoreNode(std::string_view name);
+
+    llvm::Value* generate(llvm::IRBuilder<>* builder) override;
+
+    std::string name;
+};
+
+class VarLoadNode : public ExprNode {
+public:
+    explicit VarLoadNode(std::string_view name);
+
+    llvm::Value* generate(llvm::IRBuilder<>* builder) override;
+
+    std::string name;
+};
+
 #endif //C_COMPILER_PRIMARY_NODE_H

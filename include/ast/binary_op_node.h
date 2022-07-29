@@ -67,4 +67,11 @@ public:
     llvm::Value* generate(llvm::IRBuilder<>* builder) override;
 };
 
+class AssignNode : public BinaryOpNode {
+public:
+    using BinaryOpNode::BinaryOpNode;
+
+    llvm::Value* generate(llvm::IRBuilder<>* builder) override;
+};
+
 #endif //C_COMPILER_BINARY_OP_NODE_H
