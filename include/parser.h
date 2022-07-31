@@ -33,7 +33,7 @@ private:
 
     /// \brief Parse tokens to get the syntax tree of an assignment subexpression.
     ///
-    /// EBNF: assign = var "=" eq
+    /// EBNF: assign = var ("=" eq | "+=" eq | "-=" eq | "*=" eq | "/=" eq | "%=" eq)
     ///
     /// \return The root of the syntax tree.
     ExprNode* assign();

@@ -38,6 +38,26 @@ ExprNode* Parser::assign() {
             variables.push_back(id);
             return new AssignNode(new VarStoreNode(id), eq());
         }
+
+        if (std::find(variables.begin(), variables.end(), id) == variables.end()) {
+            compilationError(token->line, token->str, "Undefined variable.");
+        }
+        if (consume(token, "+=")) {
+            return new AssignNode(new VarStoreNode(id),
+                                  new AddNode(new VarLoadNode(id), eq()));
+        } else if (consume(token, "-=")) {
+            return new AssignNode(new VarStoreNode(id),
+                                  new SubNode(new VarLoadNode(id), eq()));
+        } else if (consume(token, "*=")) {
+            return new AssignNode(new VarStoreNode(id),
+                                  new MulNode(new VarLoadNode(id), eq()));
+        } else if (consume(token, "/=")) {
+            return new AssignNode(new VarStoreNode(id),
+                                  new DivNode(new VarLoadNode(id), eq()));
+        } else if (consume(token, "%=")) {
+            return new AssignNode(new VarStoreNode(id),
+                                  new RemNode(new VarLoadNode(id), eq()));
+        }
     }
 
     token = previous;
