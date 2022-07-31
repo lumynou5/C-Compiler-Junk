@@ -98,6 +98,8 @@ ExprNode* Parser::mul() {
             node = new MulNode(node, unary());
         } else if (consume(token, "/")) {
             node = new DivNode(node, unary());
+        } else if (consume(token, "%")) {
+            node = new RemNode(node, unary());
         } else {
             return node;
         }

@@ -61,7 +61,7 @@ private:
 
     /// \brief Parse tokens to get the syntax tree of a multiplication subexpression.
     ///
-    /// EBNF: mul = unary ("*" unary | "/" unary)*
+    /// EBNF: mul = unary ("*" unary | "/" unary | "%" unary)*
     ///
     /// \return The root of the syntax tree.
     ExprNode* mul();
