@@ -11,7 +11,7 @@ After built, run the program with one argument like the example below:
 C-Compiler "10 + (4 - 3) * 7 + -1;"
 ```
 
-The available operators include addition, subtraction, multiplication, division,
+The available operators include addition, subtraction, multiplication, division, remainder,
 unary plus, unary minus, relational operators, and equality operators.
 
 The last statement of the given semicolon-split sequence is the return of the main function.
@@ -20,3 +20,4 @@ You can use variables like `foo = 10; foo + 1;`.
 Trying to access a variable that hasn't assigned before causes compilation error.
 
 The program will output LLVM IR into stdout.
+You may redirect the output into a file and run it with `lli`.
