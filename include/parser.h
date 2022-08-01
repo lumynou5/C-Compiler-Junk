@@ -21,10 +21,10 @@ public:
 private:
     /// \brief Parse tokens to get the syntax tree of a statement sequence.
     ///
-    /// EBNF: normal_state = (expr ";")*
+    /// EBNF: state = (expr ";" | "return" expr ";")*
     ///
     /// \return The root of the syntax tree.
-    StateNode* normal_state();
+    StateNode* state();
 
     /// \brief Parse tokens to get the syntax tree of an expression.
     ///

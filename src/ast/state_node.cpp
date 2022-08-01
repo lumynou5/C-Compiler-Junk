@@ -14,5 +14,14 @@ llvm::Value* NormalStateNode::generate(llvm::IRBuilder<>* builder) {
 
 NormalStateNode::~NormalStateNode() {
     delete content;
-    delete next;
+}
+
+RetStateNode::RetStateNode(ExprNode* value) : value(value) {}
+
+RetStateNode::~RetStateNode() {
+    delete value;
+}
+
+llvm::Value* RetStateNode::generate(llvm::IRBuilder<>* builder) {
+    return builder->CreateRet(value->generate(builder));
 }

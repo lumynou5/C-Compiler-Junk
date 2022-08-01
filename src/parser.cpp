@@ -3,7 +3,7 @@
 #include "error.hpp"
 
 Parser::Parser(Token* token) : token(token) {
-    ast = normal_state();
+    ast = state();
 }
 
 Parser::~Parser() {
@@ -14,16 +14,24 @@ Node* Parser::getAST() {
     return ast;
 }
 
-StateNode* Parser::normal_state() {
+StateNode* Parser::state() {
     if (token->kind == TokenKind::Eof) {
         return nullptr;
+    }
+
+    if (consume(token, "return")) {
+        auto node = expr();
+        if (!consume(token, ";")) {
+            compilationError(token->line, token->str, "Expected `;`.");
+        }
+        return new RetStateNode(node);
     }
 
     auto node = expr();
     if (!consume(token, ";")) {
         compilationError(token->line, token->str, "Expected `;`.");
     }
-    return new NormalStateNode(node, normal_state());
+    return new NormalStateNode(node, state());
 }
 
 ExprNode* Parser::expr() {
