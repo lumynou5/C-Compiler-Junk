@@ -1,7 +1,27 @@
 # C-Compiler
 
-> A C language compiler for practice.
-> WIP!
+> WIP! It cannot compile C source code now.
+
+This is a C compiler using LLVM.
+
+It's a practice project to learn how to make a compiler,
+and then you may use the same concepts to make a compiler of the new language you designed.
+The implementations and comments probably aren't good enough, so welcome to create issues and PRs.
+
+## Building
+
+Dependencies:
+- CMake
+- [fmt](https://github.com/fmtlib/fmt)
+- LLVM
+
+Use the commands below or IDEs such as CLion to build.
+
+```shell
+# In the project root directory.
+cmake .
+make
+```
 
 ## Usage
 
@@ -23,7 +43,7 @@ Trying to access a variable that hasn't assigned before causes compilation error
 The program will output LLVM IR into stdout.
 You may redirect the output into a file and run it with `lli`.
 
-### Command Template
+### Command Templates
 
 #### Optimize the IR and output
 
