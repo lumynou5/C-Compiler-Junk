@@ -16,6 +16,10 @@ llvm::Value* DivNode::generate(llvm::IRBuilder<>* builder) {
     return builder->CreateSDiv(lhs->generate(builder), rhs->generate(builder));
 }
 
+llvm::Value* RemNode::generate(llvm::IRBuilder<>* builder) {
+    return builder->CreateSRem(lhs->generate(builder), rhs->generate(builder));
+}
+
 llvm::Value* AddNode::generate(llvm::IRBuilder<>* builder) {
     return builder->CreateAdd(lhs->generate(builder), rhs->generate(builder));
 }

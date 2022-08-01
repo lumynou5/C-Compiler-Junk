@@ -19,11 +19,17 @@ Token* tokenize(char* source) {
             // If the first character is a digit, it's a number.
             curr = newToken(TokenKind::Num, curr, line, ptr, 0);
             curr->val = std::strtol(ptr, &ptr, 10);
-        } else if (!std::strncmp(ptr, "==", 2) || !std::strncmp(ptr, "!=", 2) ||
+        } else if (!std::strncmp(ptr, "return", 6) && !std::isalnum(ptr[6]) && ptr[6] != '_') {
+            curr = newToken(TokenKind::Res, curr, line, ptr, 6);
+            ptr += 6;
+        } else if (!std::strncmp(ptr, "+=", 2) || !std::strncmp(ptr, "-=", 2) ||
+                   !std::strncmp(ptr, "*=", 2) || !std::strncmp(ptr, "/=", 2) ||
+                   !std::strncmp(ptr, "%=", 2) ||
+                   !std::strncmp(ptr, "==", 2) || !std::strncmp(ptr, "!=", 2) ||
                    !std::strncmp(ptr, "<=", 2) || !std::strncmp(ptr, ">=", 2)) {
             curr = newToken(TokenKind::Res, curr, line, ptr, 2);
             ptr += 2;
-        } else if (std::strchr("+-*/<>()=;", *ptr)) {
+        } else if (std::strchr("+-*/%<>()=;", *ptr)) {
             curr = newToken(TokenKind::Res, curr, line, ptr++, 1);
         } else if (std::isalpha(*ptr) || *ptr == '_') {
             char* last = ptr;

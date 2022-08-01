@@ -27,6 +27,13 @@ public:
     llvm::Value* generate(llvm::IRBuilder<>* builder) override;
 };
 
+class RemNode : public BinaryOpNode {
+public:
+    using BinaryOpNode::BinaryOpNode;
+
+    llvm::Value* generate(llvm::IRBuilder<>* builder) override;
+};
+
 class AddNode : public BinaryOpNode {
 public:
     using BinaryOpNode::BinaryOpNode;

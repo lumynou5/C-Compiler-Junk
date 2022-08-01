@@ -3,7 +3,7 @@
 #include "error.hpp"
 
 Parser::Parser(Token* token) : token(token) {
-    ast = normal_state();
+    ast = state();
 }
 
 Parser::~Parser() {
@@ -14,16 +14,24 @@ Node* Parser::getAST() {
     return ast;
 }
 
-StateNode* Parser::normal_state() {
+StateNode* Parser::state() {
     if (token->kind == TokenKind::Eof) {
         return nullptr;
+    }
+
+    if (consume(token, "return")) {
+        auto node = expr();
+        if (!consume(token, ";")) {
+            compilationError(token->line, token->str, "Expected `;`.");
+        }
+        return new RetStateNode(node);
     }
 
     auto node = expr();
     if (!consume(token, ";")) {
         compilationError(token->line, token->str, "Expected `;`.");
     }
-    return new NormalStateNode(node, normal_state());
+    return new NormalStateNode(node, state());
 }
 
 ExprNode* Parser::expr() {
@@ -37,6 +45,26 @@ ExprNode* Parser::assign() {
         if (consume(token, "=")) {
             variables.push_back(id);
             return new AssignNode(new VarStoreNode(id), eq());
+        }
+
+        if (std::find(variables.begin(), variables.end(), id) == variables.end()) {
+            compilationError(token->line, token->str, "Undefined variable.");
+        }
+        if (consume(token, "+=")) {
+            return new AssignNode(new VarStoreNode(id),
+                                  new AddNode(new VarLoadNode(id), eq()));
+        } else if (consume(token, "-=")) {
+            return new AssignNode(new VarStoreNode(id),
+                                  new SubNode(new VarLoadNode(id), eq()));
+        } else if (consume(token, "*=")) {
+            return new AssignNode(new VarStoreNode(id),
+                                  new MulNode(new VarLoadNode(id), eq()));
+        } else if (consume(token, "/=")) {
+            return new AssignNode(new VarStoreNode(id),
+                                  new DivNode(new VarLoadNode(id), eq()));
+        } else if (consume(token, "%=")) {
+            return new AssignNode(new VarStoreNode(id),
+                                  new RemNode(new VarLoadNode(id), eq()));
         }
     }
 
@@ -98,6 +126,8 @@ ExprNode* Parser::mul() {
             node = new MulNode(node, unary());
         } else if (consume(token, "/")) {
             node = new DivNode(node, unary());
+        } else if (consume(token, "%")) {
+            node = new RemNode(node, unary());
         } else {
             return node;
         }

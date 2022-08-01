@@ -21,10 +21,10 @@ public:
 private:
     /// \brief Parse tokens to get the syntax tree of a statement sequence.
     ///
-    /// EBNF: normal_state = (expr ";")*
+    /// EBNF: state = (expr ";" | "return" expr ";")*
     ///
     /// \return The root of the syntax tree.
-    StateNode* normal_state();
+    StateNode* state();
 
     /// \brief Parse tokens to get the syntax tree of an expression.
     ///
@@ -33,7 +33,7 @@ private:
 
     /// \brief Parse tokens to get the syntax tree of an assignment subexpression.
     ///
-    /// EBNF: assign = var "=" eq
+    /// EBNF: assign = var ("=" eq | "+=" eq | "-=" eq | "*=" eq | "/=" eq | "%=" eq)
     ///
     /// \return The root of the syntax tree.
     ExprNode* assign();
@@ -61,7 +61,7 @@ private:
 
     /// \brief Parse tokens to get the syntax tree of a multiplication subexpression.
     ///
-    /// EBNF: mul = unary ("*" unary | "/" unary)*
+    /// EBNF: mul = unary ("*" unary | "/" unary | "%" unary)*
     ///
     /// \return The root of the syntax tree.
     ExprNode* mul();

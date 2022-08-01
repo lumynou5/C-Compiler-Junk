@@ -15,4 +15,15 @@ public:
     StateNode* next;
 };
 
+class RetStateNode : public StateNode {
+public:
+    explicit RetStateNode(ExprNode* value);
+
+    ~RetStateNode() override;
+
+    llvm::Value* generate(llvm::IRBuilder<>* builder) override;
+
+    ExprNode* value;
+};
+
 #endif //C_COMPILER_STATE_NODE_H

@@ -11,7 +11,7 @@ Generator::Generator(Node* node)
     auto entry = llvm::BasicBlock::Create(context, "entry", main);
     builder->SetInsertPoint(entry);
 
-    builder->CreateRet(node->generate(builder));
+    node->generate(builder);
 
     llvm::raw_string_ostream out(ir);
     main->print(out);
