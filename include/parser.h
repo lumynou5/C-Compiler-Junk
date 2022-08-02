@@ -19,13 +19,33 @@ public:
     Node* getAST();
 
 private:
+    /// \brief Parse tokens to get the syntax tree of a statement sequence.
+    ///
+    /// EBNF: stateSeq = state*
+    ///
+    /// \return The root of the syntax tree.
+    StateNode* stateSeq();
+
     /// \brief Parse tokens to get the syntax tree of a statement.
     ///
-    /// EBNF: state = expr ";"
-    ///             | "return" expr ";"
+    /// EBNF: state = normalState | retState
     ///
     /// \return The root of the syntax tree.
     StateNode* state();
+
+    /// \brief Parse tokens to get the syntax tree of a normal statement.
+    ///
+    /// EBNF: normalState = expr ";"
+    ///
+    /// \return The root of the syntax tree.
+    NormalStateNode* normalState();
+
+    /// \brief Parse tokens to get the syntax tree of a return statement.
+    ///
+    /// EBNF: retState = "return" expr ";"
+    ///
+    /// \return The root of the syntax tree.
+    RetStateNode* retState();
 
     /// \brief Parse tokens to get the syntax tree of an expression.
     ///

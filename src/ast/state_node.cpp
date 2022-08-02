@@ -1,7 +1,10 @@
 #include "ast/state_node.h"
 
-NormalStateNode::NormalStateNode(ExprNode* content, StateNode* next)
-        : content(content), next(next) {}
+StateNode::~StateNode() {
+    delete next;
+}
+
+NormalStateNode::NormalStateNode(ExprNode* content) : content(content) {}
 
 llvm::Value* NormalStateNode::generate(llvm::IRBuilder<>* builder) {
     auto val = content->generate(builder);
@@ -14,7 +17,6 @@ llvm::Value* NormalStateNode::generate(llvm::IRBuilder<>* builder) {
 
 NormalStateNode::~NormalStateNode() {
     delete content;
-    delete next;
 }
 
 RetStateNode::RetStateNode(ExprNode* value) : value(value) {}

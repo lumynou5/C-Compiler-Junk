@@ -3,7 +3,7 @@
 #include "error.hpp"
 
 Parser::Parser(Token* token) : token(token) {
-    ast = state();
+    ast = stateSeq();
 }
 
 Parser::~Parser() {
@@ -14,11 +14,39 @@ Node* Parser::getAST() {
     return ast;
 }
 
+StateNode* Parser::stateSeq() {
+    auto root = state();
+    auto curr = root;
+    while (token->kind != TokenKind::Eof) {
+        curr->next = state();
+        curr = curr->next;
+    }
+    return root;
+}
+
 StateNode* Parser::state() {
-    if (token->kind == TokenKind::Eof) {
+    if (auto node = retState(); node) {
+        return node;
+    }
+    if (auto node = normalState(); node) {
+        return node;
+    }
+}
+
+NormalStateNode* Parser::normalState() {
+    // Empty statement.
+    if (consume(token, ";")) {
         return nullptr;
     }
 
+    auto node = expr();
+    if (!consume(token, ";")) {
+        compilationError(token->line, token->str, "Expected `;`.");
+    }
+    return new NormalStateNode(node);
+}
+
+RetStateNode* Parser::retState() {
     if (consume(token, "return")) {
         auto node = expr();
         if (!consume(token, ";")) {
@@ -26,12 +54,7 @@ StateNode* Parser::state() {
         }
         return new RetStateNode(node);
     }
-
-    auto node = expr();
-    if (!consume(token, ";")) {
-        compilationError(token->line, token->str, "Expected `;`.");
-    }
-    return new NormalStateNode(node, state());
+    return nullptr;
 }
 
 ExprNode* Parser::expr() {

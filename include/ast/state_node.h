@@ -3,16 +3,22 @@
 
 #include "node.hpp"
 
+class StateNode : public Node {
+public:
+    ~StateNode() override;
+
+    StateNode* next;
+};
+
 class NormalStateNode : public StateNode {
 public:
-    NormalStateNode(ExprNode* content, StateNode* next);
+    NormalStateNode(ExprNode* content);
 
     ~NormalStateNode() override;
 
     llvm::Value* generate(llvm::IRBuilder<>* builder) override;
 
     ExprNode* content;
-    StateNode* next;
 };
 
 class RetStateNode : public StateNode {

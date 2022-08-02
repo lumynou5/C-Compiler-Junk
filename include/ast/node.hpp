@@ -17,6 +17,4 @@ public:
 
 class ExprNode : public Node {};
 
-class StateNode : public Node {};
-
 #endif //C_COMPILER_NODE_HPP
