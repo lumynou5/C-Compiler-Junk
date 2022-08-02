@@ -19,9 +19,10 @@ public:
     Node* getAST();
 
 private:
-    /// \brief Parse tokens to get the syntax tree of a statement sequence.
+    /// \brief Parse tokens to get the syntax tree of a statement.
     ///
-    /// EBNF: state = (expr ";" | "return" expr ";")*
+    /// EBNF: state = expr ";"
+    ///             | "return" expr ";"
     ///
     /// \return The root of the syntax tree.
     StateNode* state();
