@@ -28,15 +28,14 @@ StateNode* Parser::state() {
     if (auto node = retState(); node) {
         return node;
     }
-    if (auto node = normalState(); node) {
-        return node;
-    }
+
+    return normalState()
 }
 
 NormalStateNode* Parser::normalState() {
     // Empty statement.
     if (consume(token, ";")) {
-        return nullptr;
+        return new NormalStateNode(nullptr);
     }
 
     auto node = expr();

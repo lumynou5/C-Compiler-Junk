@@ -7,12 +7,14 @@ StateNode::~StateNode() {
 NormalStateNode::NormalStateNode(ExprNode* content) : content(content) {}
 
 llvm::Value* NormalStateNode::generate(llvm::IRBuilder<>* builder) {
-    auto val = content->generate(builder);
+    if (content) {
+        content->generate(builder);
+    }
     if (next) {
         return next->generate(builder);
-    } else {
-        return val;
     }
+
+    return nullptr;
 }
 
 NormalStateNode::~NormalStateNode() {
@@ -26,5 +28,7 @@ RetStateNode::~RetStateNode() {
 }
 
 llvm::Value* RetStateNode::generate(llvm::IRBuilder<>* builder) {
-    return builder->CreateRet(value->generate(builder));
+    builder->CreateRet(value->generate(builder));
+
+    return nullptr;
 }
