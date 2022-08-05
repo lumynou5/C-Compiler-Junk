@@ -3,7 +3,12 @@
 #include "error.hpp"
 
 Parser::Parser(Token* token) : token(token) {
-    ast = stateSeq();
+    auto curr = func();
+    ast = curr;
+    while (token->kind != TokenKind::Eof) {
+        curr->next = func();
+        curr = curr->next;
+    }
 }
 
 Parser::~Parser() {
@@ -14,14 +19,31 @@ Node* Parser::getAST() {
     return ast;
 }
 
-StateNode* Parser::stateSeq() {
-    auto root = state();
-    auto curr = root;
-    while (token->kind != TokenKind::Eof) {
-        curr->next = state();
-        curr = curr->next;
+FuncNode* Parser::func() {
+    for (auto id = consumeId(token); !id.empty();) {
+        if (!consume(token, "(")) break;
+        if (!consume(token, ")")) break;
+        if (!consume(token, "{")) break;
+
+        StateNode* state_seq = nullptr;
+        auto curr = state_seq;
+        while (!consume(token, "}")) {
+            if (token->kind == TokenKind::Eof) {
+                compilationError(token->line, token->str, "Expected `}}`.");
+            }
+
+            if (curr) {
+                curr->next = state();
+            } else {
+                curr = state();
+            }
+            curr = curr->next;
+        }
+
+        return new FuncNode(id, state_seq);
     }
-    return root;
+
+    compilationError(token->line, token->str, "Unexpected token.");
 }
 
 StateNode* Parser::state() {
@@ -29,7 +51,7 @@ StateNode* Parser::state() {
         return node;
     }
 
-    return normalState()
+    return normalState();
 }
 
 NormalStateNode* Parser::normalState() {

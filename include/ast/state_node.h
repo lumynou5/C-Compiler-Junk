@@ -1,7 +1,7 @@
 #ifndef C_COMPILER_STATE_NODE_H
 #define C_COMPILER_STATE_NODE_H
 
-#include "node.hpp"
+#include "ast/node.hpp"
 
 class StateNode : public Node {
 public:

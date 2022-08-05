@@ -3,6 +3,7 @@
 
 #include <map>
 #include "ast/binary_op_node.h"
+#include "ast/func_node.h"
 #include "ast/primary_node.h"
 #include "ast/state_node.h"
 #include "tokenizer.h"
@@ -19,12 +20,12 @@ public:
     Node* getAST();
 
 private:
-    /// \brief Parse tokens to get the syntax tree of a statement sequence.
+    /// \brief Parse tokens to get the syntax tree of a function.
     ///
-    /// EBNF: stateSeq = state*
+    /// EBNF: func = id "(" ")" "{" state* "}"
     ///
     /// \return The root of the syntax tree.
-    StateNode* stateSeq();
+    FuncNode* func();
 
     /// \brief Parse tokens to get the syntax tree of a statement.
     ///
