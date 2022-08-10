@@ -35,11 +35,11 @@ FuncNode* Parser::func() {
 
             if (curr) {
                 curr->next = state();
+                curr = curr->next;
             } else {
                 curr = state();
                 state_seq = curr;
             }
-            curr = curr->next;
         }
 
         node->state_seq = state_seq;
