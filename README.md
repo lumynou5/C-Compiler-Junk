@@ -2,24 +2,22 @@
 
 > WIP! It cannot compile C source code now.
 
-This is a C compiler using LLVM.
-
-It's a practice project to learn how to make a compiler,
-and then you may use the same concepts to make a compiler of the new language you designed.
-The implementations and comments probably aren't good enough, so welcome to create issues and PRs.
+This is just a practice project to learn how to make a compiler.
 
 ## Building
 
 Dependencies:
-- CMake
+- [CMake](https://cmake.org)
 - [fmt](https://github.com/fmtlib/fmt)
-- LLVM
+- [LLVM](https://llvm.org)
 
-Use the commands below or IDEs such as CLion to build.
+Use the commands below or an IDE such as CLion to build.
 
 ```shell
-# In the project root directory.
-cmake .
+# In the repository root directory.
+mkdir build
+cd build
+cmake ..
 make
 ```
 
@@ -58,3 +56,7 @@ You may redirect the output into a file and run it with `lli`.
 ```
 
 For some shells, you may have to use `$pipestatus[2]` or something else to get the exit status.
+
+## License
+
+All the source code is under [LICENSE.md](LICENSE.md).
