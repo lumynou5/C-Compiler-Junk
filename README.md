@@ -26,17 +26,16 @@ make
 After built, run the program with one argument like the example below:
 
 ```shell
-./C_Compiler "return 10 + 3 * 4 - (-1 == 2);"
+./C_Compiler "main() { x = 10; x += 3 * 2 - 8; x = x == 5; return x; }"
 ```
 
 The available operators include addition, subtraction, multiplication, division, remainder,
 unary plus, unary minus, relational operators, equality operators, and assignment operators.
 
-A `return` statement is necessary.
-Unreachable code after the return statement won't be parsed.
+The result of a comparison will be converted into `i32`.
 
 You can use variables like `foo = 10; return foo + 1;`.
-Trying to access a variable that hasn't assigned before causes compilation error.
+Trying to access a variable that hasn't assigned before causes a compilation error.
 
 The program will output LLVM IR into stdout.
 You may redirect the output into a file and run it with `lli`.
