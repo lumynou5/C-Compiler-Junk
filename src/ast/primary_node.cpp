@@ -1,13 +1,6 @@
 #include "ast/primary_node.h"
 
-#include <map>
 #include "error.hpp"
-
-namespace {
-
-std::map<std::string, llvm::AllocaInst*> variables;
-
-}
 
 NumNode::NumNode(long val) : val(val) {}
 
@@ -15,18 +8,20 @@ llvm::Value* NumNode::generate(llvm::IRBuilder<>* builder) {
     return builder->getInt32(val);
 }
 
-VarStoreNode::VarStoreNode(std::string_view name) : name(name) {}
+VarStoreNode::VarStoreNode(std::string_view name, Scope* current_scope)
+        : name(name), current_scope(current_scope) {}
 
 llvm::Value* VarStoreNode::generate(llvm::IRBuilder<>* builder) {
-    if (auto it = variables.find(name); it != variables.end()) {
-        return it->second;
+    if (current_scope->variables[name]) {
+        return current_scope->variables[name];
     } else {
-        return variables[name] = builder->CreateAlloca(builder->getInt32Ty());
+        return current_scope->variables[name] = builder->CreateAlloca(builder->getInt32Ty());
     }
 }
 
-VarLoadNode::VarLoadNode(std::string_view name) : name(name) {}
+VarLoadNode::VarLoadNode(std::string_view name, Scope* current_scope)
+        : name(name), current_scope(current_scope) {}
 
 llvm::Value* VarLoadNode::generate(llvm::IRBuilder<>* builder) {
-    return builder->CreateLoad(builder->getInt32Ty(), variables[name]);
+    return builder->CreateLoad(builder->getInt32Ty(), current_scope->variables[name]);
 }

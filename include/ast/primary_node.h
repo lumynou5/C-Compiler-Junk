@@ -2,6 +2,7 @@
 #define C_COMPILER_PRIMARY_NODE_H
 
 #include "ast/node.hpp"
+#include "ast/scope.hpp"
 
 class NumNode : public ExprNode {
 public:
@@ -14,20 +15,22 @@ public:
 
 class VarStoreNode : public ExprNode {
 public:
-    explicit VarStoreNode(std::string_view name);
+    VarStoreNode(std::string_view name, Scope* current_scope);
 
     llvm::Value* generate(llvm::IRBuilder<>* builder) override;
 
     std::string name;
+    Scope* const current_scope;
 };
 
 class VarLoadNode : public ExprNode {
 public:
-    explicit VarLoadNode(std::string_view name);
+    VarLoadNode(std::string_view name, Scope* current_scope);
 
     llvm::Value* generate(llvm::IRBuilder<>* builder) override;
 
     std::string name;
+    Scope* const current_scope;
 };
 
 #endif //C_COMPILER_PRIMARY_NODE_H

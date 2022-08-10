@@ -3,20 +3,18 @@
 #include "error.hpp"
 
 Parser::Parser(Token* token) : token(token) {
-    auto curr = func();
-    ast = curr;
-    while (token->kind != TokenKind::Eof) {
-        curr->next = func();
-        curr = curr->next;
+    tu = new TranslationUnit();
+    while (this->token->kind != TokenKind::Eof) {
+        tu->functions.push_back(func());
     }
 }
 
 Parser::~Parser() {
-    delete ast;
+    delete tu;
 }
 
-Node* Parser::getAST() {
-    return ast;
+TranslationUnit* Parser::getTU() {
+    return tu;
 }
 
 FuncNode* Parser::func() {
@@ -24,6 +22,9 @@ FuncNode* Parser::func() {
         if (!consume(token, "(")) break;
         if (!consume(token, ")")) break;
         if (!consume(token, "{")) break;
+
+        auto node = new FuncNode(id);
+        current_scope = &node->scope;
 
         StateNode* state_seq = nullptr;
         auto curr = state_seq;
@@ -36,11 +37,13 @@ FuncNode* Parser::func() {
                 curr->next = state();
             } else {
                 curr = state();
+                state_seq = curr;
             }
             curr = curr->next;
         }
 
-        return new FuncNode(id, state_seq);
+        node->state_seq = state_seq;
+        return node;
     }
 
     compilationError(token->line, token->str, "Unexpected token.");
@@ -87,28 +90,28 @@ ExprNode* Parser::assign() {
 
     if (auto id = consumeId(token); !id.empty()) {
         if (consume(token, "=")) {
-            variables.push_back(id);
-            return new AssignNode(new VarStoreNode(id), eq());
+            current_scope->variables[id] = nullptr;
+            return new AssignNode(new VarStoreNode(id, current_scope), eq());
         }
 
-        if (std::find(variables.begin(), variables.end(), id) == variables.end()) {
+        if (current_scope->variables.find(id) == current_scope->variables.end()) {
             compilationError(token->line, token->str, "Undefined variable.");
         }
         if (consume(token, "+=")) {
-            return new AssignNode(new VarStoreNode(id),
-                                  new AddNode(new VarLoadNode(id), eq()));
+            return new AssignNode(new VarStoreNode(id, current_scope),
+                                  new AddNode(new VarLoadNode(id, current_scope), eq()));
         } else if (consume(token, "-=")) {
-            return new AssignNode(new VarStoreNode(id),
-                                  new SubNode(new VarLoadNode(id), eq()));
+            return new AssignNode(new VarStoreNode(id, current_scope),
+                                  new SubNode(new VarLoadNode(id, current_scope), eq()));
         } else if (consume(token, "*=")) {
-            return new AssignNode(new VarStoreNode(id),
-                                  new MulNode(new VarLoadNode(id), eq()));
+            return new AssignNode(new VarStoreNode(id, current_scope),
+                                  new MulNode(new VarLoadNode(id, current_scope), eq()));
         } else if (consume(token, "/=")) {
-            return new AssignNode(new VarStoreNode(id),
-                                  new DivNode(new VarLoadNode(id), eq()));
+            return new AssignNode(new VarStoreNode(id, current_scope),
+                                  new DivNode(new VarLoadNode(id, current_scope), eq()));
         } else if (consume(token, "%=")) {
-            return new AssignNode(new VarStoreNode(id),
-                                  new RemNode(new VarLoadNode(id), eq()));
+            return new AssignNode(new VarStoreNode(id, current_scope),
+                                  new RemNode(new VarLoadNode(id, current_scope), eq()));
         }
     }
 
@@ -199,11 +202,11 @@ ExprNode* Parser::primary() {
 
     Token* variable = token;
     if (auto id = consumeId(token); !id.empty()) {
-        if (std::find(variables.begin(), variables.end(), id) == variables.end()) {
+        if (current_scope->variables.find(id) == current_scope->variables.end()) {
             compilationError(variable->line, variable->str, "Undefined variable.");
         }
 
-        return new VarLoadNode(id);
+        return new VarLoadNode(id, current_scope);
     }
 
     return new NumNode(expectNumber(token));

@@ -1,7 +1,6 @@
 #include <iostream>
 #include "tokenizer.h"
 #include "parser.h"
-#include "generator.h"
 
 int main(int argc, char** argv) {
     if (argc != 2) {
@@ -16,10 +15,10 @@ int main(int argc, char** argv) {
     Parser parser(token);
 
     // Generate.
-    Generator generator(parser.getAST());
+    parser.getTU()->generate();
 
     // Output.
-    std::cout << generator.getIR();
+    std::cout << parser.getTU()->ir();
 
     return EXIT_SUCCESS;
 }

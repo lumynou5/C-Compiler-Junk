@@ -2,11 +2,12 @@
 #define C_COMPILER_FUNC_NODE_H
 
 #include "ast/node.hpp"
+#include "ast/scope.hpp"
 #include "ast/state_node.h"
 
 class FuncNode : public Node {
 public:
-    FuncNode(std::string_view name, StateNode* state_seq);
+    explicit FuncNode(std::string_view name);
 
     ~FuncNode() override;
 
@@ -14,7 +15,8 @@ public:
 
     std::string name;
     StateNode* state_seq;
-    FuncNode* next;
+    Scope scope;
+    llvm::Module* module;
 };
 
 #endif //C_COMPILER_FUNC_NODE_H

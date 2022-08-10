@@ -1,11 +1,11 @@
 #ifndef C_COMPILER_PARSER_H
 #define C_COMPILER_PARSER_H
 
-#include <map>
 #include "ast/binary_op_node.h"
 #include "ast/func_node.h"
 #include "ast/primary_node.h"
 #include "ast/state_node.h"
+#include "ast/translation_unit.h"
 #include "tokenizer.h"
 
 class Parser {
@@ -17,7 +17,7 @@ public:
 
     ~Parser();
 
-    Node* getAST();
+    TranslationUnit* getTU();
 
 private:
     /// \brief Parse tokens to get the syntax tree of a function.
@@ -103,8 +103,8 @@ private:
     ExprNode* primary();
 
     Token* token;
-    Node* ast;
-    std::vector<std::string> variables;
+    TranslationUnit* tu;
+    Scope* current_scope;
 };
 
 #endif //C_COMPILER_PARSER_H
