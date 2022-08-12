@@ -17,6 +17,7 @@ public:
     std::string ir();
 
     std::vector<FuncNode*> functions;
+    Scope scope;
 
 private:
     llvm::LLVMContext context;

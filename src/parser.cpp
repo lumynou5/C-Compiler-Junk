@@ -23,7 +23,7 @@ FuncNode* Parser::func() {
         if (!consume(token, ")")) break;
         if (!consume(token, "{")) break;
 
-        auto node = new FuncNode(id);
+        auto node = new FuncNode(id, &tu->scope);
         current_scope = &node->scope;
 
         StateNode* state_seq = nullptr;
@@ -90,11 +90,11 @@ ExprNode* Parser::assign() {
 
     if (auto id = consumeId(token); !id.empty()) {
         if (consume(token, "=")) {
-            current_scope->variables[id] = nullptr;
+            current_scope->add(id);
             return new AssignNode(new VarStoreNode(id, current_scope), eq());
         }
 
-        if (current_scope->variables.find(id) == current_scope->variables.end()) {
+        if (!current_scope->has(id)) {
             compilationError(token->line, token->str, "Undefined variable.");
         }
         if (consume(token, "+=")) {
@@ -202,7 +202,7 @@ ExprNode* Parser::primary() {
 
     Token* variable = token;
     if (auto id = consumeId(token); !id.empty()) {
-        if (current_scope->variables.find(id) == current_scope->variables.end()) {
+        if (!current_scope->has(id)) {
             compilationError(variable->line, variable->str, "Undefined variable.");
         }
 

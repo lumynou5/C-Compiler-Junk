@@ -1,7 +1,7 @@
 #include "ast/func_node.h"
 
-FuncNode::FuncNode(std::string_view name)
-        : name(name), state_seq(nullptr), module(nullptr) {}
+FuncNode::FuncNode(std::string_view name, Scope* parent_scope)
+        : name(name), state_seq(nullptr), scope(parent_scope), module(nullptr) {}
 
 FuncNode::~FuncNode() {
     delete state_seq;

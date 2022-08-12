@@ -2,12 +2,12 @@
 #define C_COMPILER_FUNC_NODE_H
 
 #include "ast/node.hpp"
-#include "ast/scope.hpp"
+#include "ast/scope.h"
 #include "ast/state_node.h"
 
 class FuncNode : public Node {
 public:
-    explicit FuncNode(std::string_view name);
+    FuncNode(std::string_view name, Scope* parent_scope);
 
     ~FuncNode() override;
 

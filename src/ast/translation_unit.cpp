@@ -1,6 +1,7 @@
 #include "ast/translation_unit.h"
 
-TranslationUnit::TranslationUnit() : builder(context), module("from-command-line", context) {}
+TranslationUnit::TranslationUnit()
+        : scope(nullptr), builder(context), module("from-command-line", context) {}
 
 TranslationUnit::~TranslationUnit() {
     for (auto function : functions) {

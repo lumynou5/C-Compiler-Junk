@@ -12,10 +12,10 @@ VarStoreNode::VarStoreNode(std::string_view name, Scope* current_scope)
         : name(name), current_scope(current_scope) {}
 
 llvm::Value* VarStoreNode::generate(llvm::IRBuilder<>* builder) {
-    if (current_scope->variables[name]) {
-        return current_scope->variables[name];
+    if (current_scope->get(name)) {
+        return current_scope->get(name);
     } else {
-        return current_scope->variables[name] = builder->CreateAlloca(builder->getInt32Ty());
+        return current_scope->allocate(name, builder->CreateAlloca(builder->getInt32Ty()));
     }
 }
 
@@ -23,5 +23,5 @@ VarLoadNode::VarLoadNode(std::string_view name, Scope* current_scope)
         : name(name), current_scope(current_scope) {}
 
 llvm::Value* VarLoadNode::generate(llvm::IRBuilder<>* builder) {
-    return builder->CreateLoad(builder->getInt32Ty(), current_scope->variables[name]);
+    return builder->CreateLoad(builder->getInt32Ty(), current_scope->get(name));
 }

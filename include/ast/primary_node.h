@@ -2,7 +2,7 @@
 #define C_COMPILER_PRIMARY_NODE_H
 
 #include "ast/node.hpp"
-#include "ast/scope.hpp"
+#include "ast/scope.h"
 
 class NumNode : public ExprNode {
 public:
