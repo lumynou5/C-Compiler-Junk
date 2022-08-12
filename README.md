@@ -45,7 +45,7 @@ You may redirect the output into a file and run it with `lli`.
 #### Optimize the IR and output
 
 ```shell
-./C_Compiler $SOURCE | opt --O3 | llvm-dis | cat
+./C_Compiler $SOURCE | opt --O3 | llvm-dis
 ```
 
 #### Run the IR
