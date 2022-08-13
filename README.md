@@ -23,19 +23,19 @@ make
 
 ## Usage
 
-After built, run the program with one argument like the example below:
+After built, the program can be run with one argument like the example below:
 
 ```shell
 ./C_Compiler "main() { x = 10; x += 3 * 2 - 8; x = x == 5; return x; }"
 ```
 
 The available operators include addition, subtraction, multiplication, division, remainder,
-unary plus, unary minus, relational operators, equality operators, and assignment operators.
+unary plus, unary minus, relational operators, equality operators, assignment operators, and brackets.
 
-The result of a comparison will be converted into `i32`.
+The result of a comparison will be converted into `i32`, where `false` is `0` and `true` is `1`.
 
-You can use variables like `foo = 10; return foo + 1;`.
-Trying to access a variable that hasn't assigned before causes a compilation error.
+You can use variables like `foo = 10; return foo + 1;` without types.
+Trying to access a variable that hasn't defined before causes a compilation error.
 
 The program will output LLVM IR into stdout.
 You may redirect the output into a file and run it with `lli`.
@@ -58,4 +58,5 @@ For some shells, you may have to use `$pipestatus[2]` or something else to get t
 
 ## License
 
-All the source code is under [LICENSE.md](LICENSE.md).
+The source code is distributed under the MIT license.
+See [LICENSE.md](LICENSE.md) for further information.
