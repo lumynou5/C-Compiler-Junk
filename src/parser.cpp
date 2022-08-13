@@ -4,8 +4,9 @@
 
 Parser::Parser(Token* token) : token(token) {
     tu = new TranslationUnit();
+
     while (this->token->kind != TokenKind::Eof) {
-        tu->functions.push_back(func());
+        func();
     }
 }
 
@@ -23,7 +24,7 @@ FuncNode* Parser::func() {
         if (!consume(token, ")")) break;
         if (!consume(token, "{")) break;
 
-        auto node = new FuncNode(id, &tu->scope);
+        auto node = tu->addFunction(id);
         current_scope = &node->scope;
 
         StateNode* state_seq = nullptr;

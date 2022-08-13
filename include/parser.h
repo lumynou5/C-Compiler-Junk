@@ -2,7 +2,7 @@
 #define C_COMPILER_PARSER_H
 
 #include "ast/binary_op_node.h"
-#include "ast/func_node.h"
+#include "ast/top_node.h"
 #include "ast/primary_node.h"
 #include "ast/state_node.h"
 #include "ast/translation_unit.h"

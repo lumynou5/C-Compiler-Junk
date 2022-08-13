@@ -1,7 +1,10 @@
 #ifndef C_COMPILER_TRANSLATION_UNIT_H
 #define C_COMPILER_TRANSLATION_UNIT_H
 
-#include "ast/func_node.h"
+#include <string>
+#include <llvm/IR/IRBuilder.h>
+#include "ast/scope.h"
+#include "ast/top_node.h"
 
 class TranslationUnit {
 public:
@@ -14,12 +17,15 @@ public:
 
     void generate();
 
-    std::string ir();
+    std::string ir() const;
 
-    std::vector<FuncNode*> functions;
+    FuncNode* addFunction(std::string_view name);
+
     Scope scope;
 
 private:
+    std::vector<TopNode*> nodes;
+
     llvm::LLVMContext context;
     llvm::IRBuilder<> builder;
     llvm::Module module;
