@@ -25,6 +25,7 @@ FuncNode* Parser::func() {
         if (!consume(token, "{")) break;
 
         auto node = tu->addFunction(id);
+
         current_scope = &node->scope;
 
         StateNode* state_seq = nullptr;
@@ -42,6 +43,8 @@ FuncNode* Parser::func() {
                 state_seq = curr;
             }
         }
+
+        current_scope = current_scope->parent;
 
         node->state_seq = state_seq;
         return node;
