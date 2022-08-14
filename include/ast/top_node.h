@@ -14,9 +14,9 @@ public:
     ~FuncNode() override;
 
     llvm::Value* generate(llvm::IRBuilder<>* builder) override;
+
     const std::string name;
     StateNode* state_seq;
-
     Scope scope;
 
 private:
