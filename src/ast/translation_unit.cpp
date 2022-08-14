@@ -4,12 +4,12 @@ TranslationUnit::TranslationUnit()
         : scope(nullptr), builder(context), module("from-command-line", context) {}
 
 TranslationUnit::~TranslationUnit() {
-    std::destroy(nodes.begin(), nodes.end());
+    std::destroy(functions.begin(), functions.end());
 }
 
 void TranslationUnit::generate() {
-    for (auto node : nodes) {
-        node->generate(&builder);
+    for (auto function : functions) {
+        function.second.second = function.second.first->generate(&builder);
     }
 }
 
@@ -20,8 +20,12 @@ std::string TranslationUnit::ir() const {
     return str;
 }
 
-FuncNode* TranslationUnit::addFunction(std::string_view name) {
+FuncNode* TranslationUnit::addFunction(const std::string& name) {
     auto node = new FuncNode(name, &scope, &module);
-    nodes.push_back(node);
+    functions[name] = std::make_pair(node, nullptr);
     return node;
+}
+
+llvm::Value* TranslationUnit::getFunction(const std::string& name) {
+    return functions[name].second;
 }

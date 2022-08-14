@@ -98,22 +98,34 @@ ExprNode* Parser::assign() {
             return new AssignNode(new VarStoreNode(id, current_scope), eq());
         }
 
-        if (!current_scope->has(id)) {
-            compilationError(token->line, token->str, "Undefined variable.");
-        }
         if (consume(token, "+=")) {
+            if (!current_scope->has(id)) {
+                compilationError(token->line, token->str, "Undefined variable.");
+            }
             return new AssignNode(new VarStoreNode(id, current_scope),
                                   new AddNode(new VarLoadNode(id, current_scope), eq()));
         } else if (consume(token, "-=")) {
+            if (!current_scope->has(id)) {
+                compilationError(token->line, token->str, "Undefined variable.");
+            }
             return new AssignNode(new VarStoreNode(id, current_scope),
                                   new SubNode(new VarLoadNode(id, current_scope), eq()));
         } else if (consume(token, "*=")) {
+            if (!current_scope->has(id)) {
+                compilationError(token->line, token->str, "Undefined variable.");
+            }
             return new AssignNode(new VarStoreNode(id, current_scope),
                                   new MulNode(new VarLoadNode(id, current_scope), eq()));
         } else if (consume(token, "/=")) {
+            if (!current_scope->has(id)) {
+                compilationError(token->line, token->str, "Undefined variable.");
+            }
             return new AssignNode(new VarStoreNode(id, current_scope),
                                   new DivNode(new VarLoadNode(id, current_scope), eq()));
         } else if (consume(token, "%=")) {
+            if (!current_scope->has(id)) {
+                compilationError(token->line, token->str, "Undefined variable.");
+            }
             return new AssignNode(new VarStoreNode(id, current_scope),
                                   new RemNode(new VarLoadNode(id, current_scope), eq()));
         }
@@ -204,6 +216,10 @@ ExprNode* Parser::primary() {
         return node;
     }
 
+    if (auto node = funcCall()) {
+        return node;
+    }
+
     Token* variable = token;
     if (auto id = consumeId(token); !id.empty()) {
         if (!current_scope->has(id)) {
@@ -214,4 +230,18 @@ ExprNode* Parser::primary() {
     }
 
     return new NumNode(expectNumber(token));
+}
+
+ExprNode* Parser::funcCall() {
+    Token* previous = token;
+
+    for (auto id = consumeId(token); !id.empty();) {
+        if (consume(token, "(")) break;
+        if (consume(token, ")")) break;
+
+        return new FuncCallNode(id, tu);
+    }
+
+    token = previous;
+    return nullptr;
 }

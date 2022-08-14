@@ -20,5 +20,5 @@ llvm::Value* FuncNode::generate(llvm::IRBuilder<>* builder) {
         state_seq->generate(builder);
     }
 
-    return nullptr;
+    return func;
 }

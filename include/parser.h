@@ -97,10 +97,17 @@ private:
 
     /// \brief Parse tokens to get the syntax tree of a primary subexpression.
     ///
-    /// EBNF: "(" expr ")" | var | num
+    /// EBNF: "(" expr ")" | funcCall | var | num
     ///
     /// \return The root of the syntax tree.
     ExprNode* primary();
+
+    /// \brief Parse tokens to get the syntax tree of a function calling.
+    ///
+    /// EBNF: func "(" ")"
+    ///
+    /// \return The root of the syntax tree.
+    ExprNode* funcCall();
 
     Token* token;
     TranslationUnit* tu;

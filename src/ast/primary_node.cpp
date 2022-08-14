@@ -25,3 +25,12 @@ VarLoadNode::VarLoadNode(std::string_view name, Scope* current_scope)
 llvm::Value* VarLoadNode::generate(llvm::IRBuilder<>* builder) {
     return builder->CreateLoad(builder->getInt32Ty(), current_scope->get(name));
 }
+
+FuncCallNode::FuncCallNode(std::string_view name, TranslationUnit* tu)
+        : name(name), tu(tu) {}
+
+llvm::Value* FuncCallNode::generate(llvm::IRBuilder<>* builder) {
+    return builder->CreateCall(llvm::FunctionCallee(
+            llvm::FunctionType::get(builder->getInt32Ty(), false),
+            tu->getFunction(name)));
+}
