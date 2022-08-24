@@ -42,6 +42,8 @@ You may redirect the output into a file and run it with `lli`.
 
 ### Command Templates
 
+Replace `$SOURCE` with your code like `(cat source.c)` or `$(cat source.c)`, depends on the shell.
+
 #### Optimize the IR and output
 
 ```shell
