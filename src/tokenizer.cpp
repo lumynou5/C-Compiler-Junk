@@ -5,8 +5,10 @@
 Token* tokenize(char* source) {
     char* line = source;
     char* ptr = source;
-    Token head;
+
+    Token head; // The fake head of the token sequence.
     Token* curr = &head;
+
     while (*ptr) {
         if (*ptr == '\n') {
             line = ptr;
@@ -30,6 +32,7 @@ Token* tokenize(char* source) {
             curr = newToken(TokenKind::Res, curr, line, ptr, 2);
             ptr += 2;
         } else if (std::strchr("+-*/%<>()=;{}", *ptr)) {
+            // If the current processing character is one in the string.
             curr = newToken(TokenKind::Res, curr, line, ptr++, 1);
         } else if (std::isalpha(*ptr) || *ptr == '_') {
             char* last = ptr;
@@ -40,7 +43,9 @@ Token* tokenize(char* source) {
             compilationError(line, ptr, "Unexpected character.");
         }
     }
+
     newToken(TokenKind::Eof, curr, line, ptr, 0);
+
     return head.next;
 }
 
